@@ -1,2 +1,2 @@
 # pwn_repository
-some bins and exps
+# To store some CTF_pwn_bins and exps
