@@ -18,4 +18,3 @@ io.sendlineafter("\n > ", '0')
 
 io.interactive()
 io.close()
-
