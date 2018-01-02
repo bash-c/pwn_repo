@@ -20,7 +20,7 @@
 
 ![](https://ws1.sinaimg.cn/large/006AWYXBly1fkq1tczbi3j30ou0lct8t.jpg)
 
->  有两点需要注意：m
+>  有两点需要注意：
 
 1. 因为edit number中修改的数据是通过**%d**输入的，因此需要以整形的方式输入**call_me_maybe**函数的地址
 2. 修改ret的地址之后，还需要再输入一次0来退出**run_program**的循环来出发ret
