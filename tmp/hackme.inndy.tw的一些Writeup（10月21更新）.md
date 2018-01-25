@@ -1,4 +1,4 @@
-# hackme.inndy.tw的一些Writeup（1月20日更新）
+# hackme.inndy.tw的一些Writeup（1月25日更新）
 
 > 转载请表明出处：http://www.cnblogs.com/WangAoBo/p/7706719.html
 
@@ -149,7 +149,35 @@ def getAddr():
 
 > 需要注意的是write函数的长度是由用户输入决定的，给buf一个较小的值即可
 
-#### 0x08 rsbo 
+#### 0x09 onepunch
+
+> 本来以为onepunch的意思是构造好payload一发get shell， 后来才发现是一个字节一个字节的打
+
+题中有一个任意地址写一个字节的漏洞，刚开始觉得无从下手，后来调试的时候发现代码段为rwxp权限，才觉得柳暗花明。
+
+![](https://ws1.sinaimg.cn/large/006AWYXBly1fnt5r9gmg0j30r80h149o.jpg)
+
+既然可以在代码段任意地址写，就意味着我们可以为所欲为的修改代码流程，因此就可以将
+
+> .text:0000000000400767                 jnz     short loc_400773
+
+修改为
+
+> .text:0000000000400767                 jnz    0x40071D
+
+这样就构成了一个循环，接下来在合适的位置写shellcode，然后跳转到shellcode即可
+
+##### payload：
+
+![](https://ws1.sinaimg.cn/large/006AWYXBly1fnt61kw6nyj30k809tn1v.jpg)
+
+> 至于怎么确定要patch的地址和值，我推荐keypatch，用keypatch修改完伪代码后，通过将 　*Options -> General ->Number of Opcode byte*修改为非０值对比修改前后的字节码即可
+>
+> ![](https://ws1.sinaimg.cn/large/006AWYXBly1fnt641x5hij30i20c1t95.jpg)
+>
+> ![](https://ws1.sinaimg.cn/large/006AWYXBly1fnt64pqggxj30tc0chq39.jpg)
+
+#### 0x0A rsbo 
 
 这道题的利用方法倒是第一次见到，对于read和write的第一个参数fd（文件描述符），fd = 0时代表标准输入stdin，1时代表标准输出stdout，2时代表标准错误stderr，**3~9则代表打开的文件**。这一题的利用方式利用方式就是利用rop先用open函数打开位于/home/rsbo/的flag，然后再用read(3, )把flag写到一个固定地址上，最后用write输出
 
@@ -157,7 +185,23 @@ def getAddr():
 
 ![](https://ws1.sinaimg.cn/large/006AWYXBly1fkq4vt2qwfj30so0800ty.jpg)
 
+#### 0x0B leave_msg
 
+经过分析代码的逻辑,绕过下边的限制,就可以覆写got表:
+
+```c
+if ( v4 <= 64 && nptr != 45 )
+  dword_804A060[v4] = (int)strdup(&buf);
+```
+而v4=atoi(&ntpr),经过搜索atoi函数会跳过字符串开头的空白字符,因此只要构造**(空格)-16**就可以同时绕过上边的两个限制来覆写puts的got表,然后再用\x00绕过strlen的限制就可以执行shellcode,payload如下:
+
+![](https://ws1.sinaimg.cn/large/006AWYXBly1fnqin1yr27j30os01tt9m.jpg)
+
+此时的程序流程如下:
+
+![](https://ws1.sinaimg.cn/large/006AWYXBly1fnqirykfexj30ik0dpq3f.jpg)
+
+> 至于0x36是怎么来的,我是调试看出来的,如果哪位表哥有静态计算的方法,还请不吝赐教!
 
 ### reverse
 
@@ -574,7 +618,53 @@ for i in xrange(42):
 print ans
 ```
 
-#### 0x07 what-the-hell
+#### 0x07 2018-rev
+
+这个我也不知道用的是不是预期解。
+
+直接运行文件，提示
+
+> argc == 2018 && argv\[0][0] == 1 && envp\[0][0] == 1
+
+经过调试写了一个gdb脚本绕过第一层验证
+
+```bash
+b *0x4005F0
+r
+
+#set args
+set $rdi=2018
+#dumpargs --force
+set *((long *)0x7fffffffe332)=0x0101010101010101
+set *((long *)0x7fffffffe34d)=0x0101010101010101
+c
+
+# zdump /etc/localtime
+# 因为ASLR请自行修改对应地址
+```
+
+第二层验证提示
+
+> Bad timing, you should open this at 2018/1/1 00:00:00 (UTC) :(
+
+刚开始的想法也是和第一层验证一样设置运行过程中各个参数的值，但后来发现这些很难找，卡了一段时间后如梦初醒，程序的运行时间是从**/etc/localtime**获取的(代码中可以看出)，只要保证程序运行的瞬间**zdump /etc/localtime**的值为**2018/1/1 00:00:00 (UTC)**即可，关于如何设置时间，刚开始的想法是在gdb调试过程中set，尝试了很久，最后还是写了一个shell
+
+```bash
+#!/usr/bin/env bash
+
+while :
+do
+	sudo date -us "2018-01-01 00:00:00"
+done
+```
+
+这样一直运行setTime.sh，然后gdb导入gdb脚本，即可获得flag
+
+![](https://ws1.sinaimg.cn/large/006AWYXBly1fnt5h2bv7vj311y0lcnek.jpg)
+
+这个题好像是文件放错了，最后的flag不完全正确，但很容易能猜出正确的flag
+
+#### 0x08 what-the-hell
 
 这个题有点意思,看题目的提示好像是要优化算法,但我用了非预期解.我把思路和写残了的代码放出来,供大家参考.
 
