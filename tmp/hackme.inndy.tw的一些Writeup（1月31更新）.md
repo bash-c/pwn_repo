@@ -1,4 +1,4 @@
-# hackme.inndy.tw的一些Writeup（1月25日更新）
+# hackme.inndy.tw的一些Writeup（1月31日更新）
 
 > 转载请表明出处：http://www.cnblogs.com/WangAoBo/p/7706719.html
 
@@ -137,7 +137,7 @@ def getAddr():
 
 放一篇学习链接:http://veritas501.space/2017/04/28/%E8%AE%BAcanary%E7%9A%84%E5%87%A0%E7%A7%8D%E7%8E%A9%E6%B3%95/
 
-##### payload:
+**payload:**
 
 ![](https://ws1.sinaimg.cn/large/006AWYXBly1flhvskji94j30do00zt8l.jpg)
 
@@ -167,7 +167,7 @@ def getAddr():
 
 这样就构成了一个循环，接下来在合适的位置写shellcode，然后跳转到shellcode即可
 
-##### payload：
+**payload：**
 
 ![](https://ws1.sinaimg.cn/large/006AWYXBly1fnt61kw6nyj30k809tn1v.jpg)
 
@@ -202,6 +202,147 @@ if ( v4 <= 64 && nptr != 45 )
 ![](https://ws1.sinaimg.cn/large/006AWYXBly1fnqirykfexj30ik0dpq3f.jpg)
 
 > 至于0x36是怎么来的,我是调试看出来的,如果哪位表哥有静态计算的方法,还请不吝赐教!
+
+#### 0x0C stack
+
+这个题开了全保护，第一眼看上去挺吓人，但其实漏洞很容易发现，pop时并没有对下标作出检查，这就意味着我们可以通过一直pop利用数组越界从栈上leak，先通过调试看栈结构
+
+![](https://ws1.sinaimg.cn/large/006AWYXBly1fnzi618q3bj30ly0f0qd7.jpg)
+
+可以看出，通过一直pop可以泄露**\_IO\_2\_1\_stdout_**的地址，进而确定libc的装载基址和one_gadget地址
+
+```python
+def getBase():
+    #  debug()
+    for i in xrange(15):
+        io.sendlineafter("Cmd >>", "p")
+        io.recvuntil("-> ")
+
+    libc_base = (int(io.recvuntil("\n", drop = True)) & 0xffffffff)- libc.symbols["_IO_2_1_stdout_"]
+    info("libc_base -> 0x%x" % libc_base)
+    one_gadget = libc_base + one_gadget_offset
+
+    return one_gadget
+    #  return libc_base
+```
+
+通过**main+27, main+427**等地址可以泄露elf的装载基址（当然并没有用到），并且经过观察，**main+27, main+427分别是\__x86\_get_pc_thunk_dx和stack_push的返回地址**，这样我们只需要把main+427覆盖为one_gadget的地址，再次调用stack_push时，就可以返回到one_gadget，进而get shell，有一个坑点是0xf段的地址会发生数据溢出，需要我们转成int32的类型。
+
+虽然听起来很麻烦但只要耐心调试并不难，这个题目的flag也说明了本题的重点就是leak from stack。
+
+**关于这个题有两点值得一提：**
+
+1. 刚打开文件使用F5时报错
+
+   ![](https://ws1.sinaimg.cn/large/006AWYXBly1fnzicish9aj30b404laa0.jpg)
+
+   很容易搜索到这是因为函数的参数个数不匹配，我们定位到0x78D，发现540这个函数有一个参数，但IDA并没有正确识别
+
+   ![](https://ws1.sinaimg.cn/large/006AWYXBly1fnzie9234pj30n107k74e.jpg)
+
+   手动指定一个参数后（快捷键y指定类型），这个函数的报错就解决了
+
+   ![](https://ws1.sinaimg.cn/large/006AWYXBly1fnzifymdtnj30mn072mx8.jpg)
+
+   同样的方法修复之后的报错，就可以F5查看伪代码了
+
+   ![](https://ws1.sinaimg.cn/large/006AWYXBly1fnzihpdrbkj30tg0chweo.jpg)
+
+   实现查看伪代码后，可以通过查看函数的具体实现进一步识别函数和修正函数参数
+
+   ![](https://ws1.sinaimg.cn/large/006AWYXBly1fnzijqjkxmj30dw03d0sm.jpg)
+
+   如上图的578函数，可以看出实际调用了hex(8128 + 56)这个地址，而这个地址在IDA中可以看出是scanf的地址，这样我们就可以通过scanf的参数列表进一步修正参数了，附一张我修复之后的图
+
+   ![](https://ws1.sinaimg.cn/large/006AWYXBly1fnzinjzwknj30mv0d0jri.jpg)
+
+   这样在通过对比题目给出的源码，就很容易分析程序的功能了
+
+   2. 这个题目开启了PIE保护，利用pwn.gdb.attach调试的时候和没有开启PIE保护的有些不同。
+
+      以前我调试开启了PIE保护elf的方式是Uriel师傅教我的先找elf装载基址
+
+      ```python
+      from pwn import *
+      import sys, os
+      import re
+
+      wordSz = 4
+      hwordSz = 2
+      bits = 32
+      PIE = 0
+      mypid=0
+
+
+      context(arch='amd64', os='linux', log_level='debug')
+
+      def leak(address, size):
+         with open('/proc/%s/mem' % mypid) as mem:
+            mem.seek(address)
+            return mem.read(size)
+
+      def findModuleBase(pid, mem):
+         name = os.readlink('/proc/%s/exe' % pid)
+         with open('/proc/%s/maps' % pid) as maps:
+            for line in maps:
+               if name in line:
+                  addr = int(line.split('-')[0], 16)
+                  mem.seek(addr)
+                  if mem.read(4) == "\x7fELF":
+                     bitFormat = u8(leak(addr + 4, 1))
+                     if bitFormat == 2:
+                        global wordSz
+                        global hwordSz
+                        global bits
+                        wordSz = 8
+                        hwordSz = 4
+                        bits = 64
+                     return addr
+         log.failure("Module's base address not found.")
+         sys.exit(1)
+
+      def debug(addr = 0):
+          global mypid
+          mypid = proc.pidof(r)[0]
+          raw_input('debug:')
+          with open('/proc/%s/mem' % mypid) as mem:
+              moduleBase = findModuleBase(mypid, mem)
+              gdb.attach(r, "set follow-fork-mode parent\nb *" + hex(moduleBase+addr))    
+      ```
+
+      但做这道题题时发现pwn.gdb.attach只有第一个参数是必须的
+
+      ![](https://ws1.sinaimg.cn/large/006AWYXBly1fnziwaesg0j30og0m7k21.jpg)
+
+      这样就可以先进入gdb，通过vmmap找到elf基址后在下断点进行调试了
+
+      ![](https://ws1.sinaimg.cn/large/006AWYXBly1fnziz8gnhoj309j02iaag.jpg)
+
+      ![](https://ws1.sinaimg.cn/large/006AWYXBly1fnziyk9lebj30qj0eqtio.jpg)
+
+#### 0x0D very_overflow
+
+这个题目给了源码，分析起来方便了不少。这个题的漏洞也很容易发现，虽然申请了长度为128*(sizeof(buffer))的缓冲区，但可以无限的add_note，这就意味着我们可以先重复add_note耗尽缓冲区，然后继续add_note和show_note时，就可以leak类似__libc_start_main这些信息来确定libc装载基址了，有了libc装载基址后，通过rop构造system("/bin/sh")或者one_gadget都可以求解
+
+![](https://ws1.sinaimg.cn/large/006AWYXBly1fnzjfuveuaj30ti0bh0zy.jpg)
+
+至于add_note多少次，通过调试可以很清楚的算出来
+
+另外就是刚开始本地可以get shell，但远程连接很容易超时，后来把context.log_level换成了info，减少了打印花费的时间，又把io.sendlineafter换成了直接io.sendline，就不容易超时了
+
+#### 0x0E tictactoe-1
+
+给的elf文件逆起来比较繁琐，通过反编译可以找到棋的源码，了解了程序的大体流程后，可以发现在落子时可以通过数组越界覆写GOT表
+
+![](https://ws1.sinaimg.cn/large/006AWYXBly1fnzjlzdk5mj30lt0c2mxc.jpg)
+
+但因为程序有一个判负退出的功能，因此经过实验最多只能写三个字节，但对第一题而言，三个字节已经足够overwrite memset@got为打印flag的地址
+
+![](https://ws1.sinaimg.cn/large/006AWYXBly1fnzjpd156mj30qn0bw0sx.jpg)
+
+第一题很快就解决了，至于tictatoe-2，虽然get shell拿到了flag，但根据flag形式需要用ret2dl_solve，等我用ret2dl_solve解决时再来补wp
+
+
 
 ### reverse
 
@@ -796,7 +937,145 @@ zwhubuntu师傅告诉我这题可以用xortool解，项目地址https://github.c
 
 ![](https://ws1.sinaimg.cn/large/006AWYXBly1fkr5bufy5mj30hy0fl125.jpg)
 
+####0x01 ffa
 
+这个题就只想说z3大法好了。
+
+```python
+#!/usr/bin/env python3
+import sympy
+import json
+
+m = sympy.randprime(2**257, 2**258)
+M = sympy.randprime(2**257, 2**258)
+a, b, c = [(sympy.randprime(2**256, 2**257) % m) for _ in range(3)]
+
+x = (a + b * 3) % m
+y = (b - c * 5) % m
+z = (a + c * 8) % m
+
+flag = int(open('flag', 'rb').read().strip().hex(), 16)
+p = pow(flag, a, M)
+q = pow(flag, b, M)
+
+json.dump({ key: globals()[key] for key in "Mmxyzpq" }, open('crypted', 'w'))
+# {"p": 240670121804208978394996710730839069728700956824706945984819015371493837551238, "q": 63385828825643452682833619835670889340533854879683013984056508942989973395315, "M": 349579051431173103963525574908108980776346966102045838681986112083541754544269, "z": 213932962252915797768584248464896200082707350140827098890648372492180142394587, "m": 282832747915637398142431587525135167098126503327259369230840635687863475396299, "x": 254732859357467931957861825273244795556693016657393159194417526480484204095858, "y": 261877836792399836452074575192123520294695871579540257591169122727176542734080}
+```
+
+程序的逻辑很简单，生成了几个大随机数**M, m, x, y, z, p, q**，通过分析代码不难得出如果得到a或者b就能得到flag，但问题就在于，怎么求出a或者b。
+
+刚开始的想法是通过有限域的方法化简，得到a或者b，但正要动手时转念一想，题上的约束关系都很明确，可以用z3试一下，于是写了z3求解的代码：
+
+```python
+def getabc():
+    a = BitVec("a", 265)
+    b = BitVec("b", 265)
+    c = BitVec("c", 265)
+    x = d["x"]
+    y = d["y"]
+    z = d["z"]
+    m = d["m"]
+    #  print x, y, z
+    s = Solver()
+    s.add(UGT(a, pow(2, 256, m)))
+    s.add(ULT(a, pow(2, 257, m)))
+    s.add(UGT(b, pow(2, 256, m)))
+    s.add(ULT(b, pow(2, 257, m)))
+    s.add(UGT(c, pow(2, 256, m)))
+    s.add(ULT(c, pow(2, 257, m)))
+    s.add(x == (a + b * 3) % m)
+    s.add(y == (b - c * 5) % m)
+    s.add(z == (a + c * 8) % m)
+    
+    while s.check() == sat:
+        if isPrime(s.model()[a].as_long()) and isPrime(s.model()[b].as_long()) and isPrime(s.model()[c].as_long()):
+            print s.model()
+        A, B, C = s.model()[a].as_long(), s.model()[b].as_long(), s.model()[c].as_long()
+        s.add(Or(a != s.model()[a], b != s.model()[b], c != s.model()[c]))
+    else:
+        print "Finished"
+        return A, B, C
+```
+
+> 有两点需要注意：
+>
+> 1. 用BitVec声明变量时，首先要估算中间变量的范围，确保运算过程中数据不会溢出(如该题中使用了较大的265位)，但为了运行速度也不能过大
+> 2. 大整数的比较大小建议使用UGT/ULT代替>/<
+
+本来运行的时候还替z3担心了一下会不会因为数据太大直接崩掉，但没想到用了短短的8s就跑出了结果
+
+![](https://ws1.sinaimg.cn/large/006AWYXBly1fntrjndsyyj30k507gdjy.jpg)
+
+计算出a，b，c后，主要问题就解决了。
+
+意识到使用flag的加密实际上是RSA时，利用a和b进行了共模攻击，很快就出flag了
+
+```python
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+__Auther__ = 'M4x'
+
+from libnum import prime_test as isPrime
+from libnum import n2s, xgcd, invmod
+from z3 import *
+
+d = {"p": 240670121804208978394996710730839069728700956824706945984819015371493837551238, "q": 63385828825643452682833619835670889340533854879683013984056508942989973395315, "M": 349579051431173103963525574908108980776346966102045838681986112083541754544269, "z": 213932962252915797768584248464896200082707350140827098890648372492180142394587, "m": 282832747915637398142431587525135167098126503327259369230840635687863475396299, "x": 254732859357467931957861825273244795556693016657393159194417526480484204095858, "y": 261877836792399836452074575192123520294695871579540257591169122727176542734080}
+
+def getabc():
+    a = BitVec("a", 265)
+    b = BitVec("b", 265)
+    c = BitVec("c", 265)
+    x = d["x"]
+    y = d["y"]
+    z = d["z"]
+    m = d["m"]
+    #  print x, y, z
+    s = Solver()
+    s.add(UGT(a, pow(2, 256, m)))
+    s.add(ULT(a, pow(2, 257, m)))
+    s.add(UGT(b, pow(2, 256, m)))
+    s.add(ULT(b, pow(2, 257, m)))
+    s.add(UGT(c, pow(2, 256, m)))
+    s.add(ULT(c, pow(2, 257, m)))
+    s.add(x == (a + b * 3) % m)
+    s.add(y == (b - c * 5) % m)
+    s.add(z == (a + c * 8) % m)
+    
+    while s.check() == sat:
+        if isPrime(s.model()[a].as_long()) and isPrime(s.model()[b].as_long()) and isPrime(s.model()[c].as_long()):
+            print s.model()
+        A, B, C = s.model()[a].as_long(), s.model()[b].as_long(), s.model()[c].as_long()
+        s.add(Or(a != s.model()[a], b != s.model()[b], c != s.model()[c]))
+    else:
+        print "Finished"
+        return A, B, C
+
+def getFlag((a, b, c)):
+    M = d["M"]
+    p = d["p"]
+    q = d["q"]
+    s1, s2, _ = xgcd(a, b)
+    if s1 < 0:
+        s1 = -s1
+        p = invmod(p, M)
+    elif s2 < 0:
+        s2 = -s2
+        q = invmod(q, M)
+
+    flag = (pow(p, s1, M) * pow(q, s2, M)) % M
+    print n2s(flag)
+    
+
+if __name__ == "__main__":
+    #  getabc()
+    getFlag(getabc())
+```
+
+整个脚本也才8s左右
+
+![](https://ws1.sinaimg.cn/large/006AWYXBly1fntrmcv0rtj30t705378b.jpg)
+
+> OwO多了一步求flag的过程，计算时间反而更短了，看来计算时间还是跟CPU的心情有关系
 
 
 
