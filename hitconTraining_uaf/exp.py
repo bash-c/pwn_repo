@@ -6,8 +6,14 @@ from pwn import *
 context.log_level = "debug"
 context.terminal = ["deepin-terminal", "-x", "sh", "-c"]
 
+def debug():
+    #  addr = int(raw_input("DEBUG: "), 16)
+    raw_input("DEBUG: ")
+    gdb.attach(io, "b *add_note")
+
 def Add(size, content):
     io.sendlineafter("choice :", "1")
+    debug()
     io.sendlineafter("size :", str(size))
     io.sendlineafter("Content :", content)
 
