@@ -1,0 +1,5 @@
+struct NODE
+{
+	void (*print)(struct NODE *);
+	char *content;
+}
