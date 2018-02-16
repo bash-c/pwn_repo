@@ -23,7 +23,15 @@ else:
 
 def DEBUG():
     raw_input("DEBUG: ")
-    gdb.attach(io)
+    payload = '''
+    b *0x804869A
+    b *0x804872C
+    b *0x80487D3
+    b *0x8048863
+    b *0x8048879
+    b *0x804893D
+    '''
+    gdb.attach(io, payload)
 
 def addNote(size, content):
     io.sendlineafter("choice :", "1")
@@ -69,6 +77,7 @@ def shell(libc_base):
     printNote(0)
 
 if __name__ == "__main__":
+    DEBUG()
     shell(leak())
     io.interactive()
     io.close()
