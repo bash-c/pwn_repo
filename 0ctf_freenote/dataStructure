@@ -1,0 +1,13 @@
+struct noteList
+{
+	int all;
+	int now;
+	struct NOTE notes[256];
+}
+
+struct NOTE
+{
+	int inuse;
+	int len;
+	char *content;
+}
