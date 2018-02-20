@@ -174,21 +174,21 @@ note_chunk中的prev_size和size为chunk的meta data，记录了chunk的一些�
 
   - **在两处调用malloc前下断点，c运行到第一次malloc前**，可以看出，在第一次malloc前，内存中没有堆
 
-    ![](http://ww1.sinaimg.cn/large/006AWYXBly1foit3vpshcj30la0l5thl.jpg)
+    ![](http://ww1.sinaimg.cn/large/006AWYXBly1fon4k350d5j30ko0lwdoo.jpg)
 
-  ![](http://ww1.sinaimg.cn/large/006AWYXBly1foiovhw6z1j30j00dtdkj.jpg)
+  ​
 
   - **n执行下一步**，第一次malloc申请的是**存放note_chunk的空间**，返回值为0x9ff8008，即第一个note_chunk的data区（**不包括perv_size和size**）是从0x9ff8008开始的，则第一个note_chunk是从0x9ff8008-0x4-0x4=0x9ff8000（**包括prev_size和size**）开始的。
 
-    ![](http://ww1.sinaimg.cn/large/006AWYXBly1foit4shddaj30io0coae3.jpg)
+    ![](http://ww1.sinaimg.cn/large/006AWYXBly1fon4lip2iqj30fx09k76v.jpg)
 
   - **c，n执行完下一次malloc**，这次malloc申请的是**存放note_chunk中content的空间**，此时再观察内存中的堆，可以看出，此时内存中存在两个chunk和一个top chunk：
 
-    ![](http://ww1.sinaimg.cn/large/006AWYXBly1foit6ypwz5j30kk09nad8.jpg)
+    ![](http://ww1.sinaimg.cn/large/006AWYXBly1fon4m834frj30hv0bvdjj.jpg)
 
     > 第二次malloc返回值为0x9ff8018，则第一个content_chunk从0x9ff8010开始，data区从0x9ff8018开始
 
-    ​	![](http://ww1.sinaimg.cn/large/006AWYXBly1foit810aq8j309z0k642f.jpg)
+    ​	![](http://ww1.sinaimg.cn/large/006AWYXBly1fon4musfk0j30ai0k5wij.jpg)
 
     解释一下这组数据，
 
@@ -201,30 +201,38 @@ note_chunk中的prev_size和size为chunk的meta data，记录了chunk的一些�
     > 我在第一次做uaf的时候因为对堆的结构不太熟悉看着pwndbg的结果困惑了很久，用gef或者libheap会有更好的效果，这里之所以继续用pwndbg做演示，一是为了给同样习惯用pwndbg的小伙伴提醒，而是因为pwndbg的chunk显示形式虽然有问题，但是严格按照malloc源码格式进行显示的，有助于我们更好的理解chunk的结构
 
     我们可以用更简单粗暴的方法观察堆区：
+![](http://ww1.sinaimg.cn/large/006AWYXBly1fon4njdyhjj30l604yq5d.jpg)
 
-    ![](http://ww1.sinaimg.cn/large/006AWYXBly1foit8yoxqpj30ks07577v.jpg)
 
     对比这两张图，就很容易分清chunk的结构了：
+![](http://ww1.sinaimg.cn/large/006AWYXBly1fofbrc8tnvj30xv0bqq42.jpg)
 
-    ![](http://ww1.sinaimg.cn/large/006AWYXBly1fofbrc8tnvj30xv0bqq42.jpg)
+![](http://ww1.sinaimg.cn/large/006AWYXBly1fogsgo59jwj30q80bjq38.jpg)
 
-    ![](http://ww1.sinaimg.cn/large/006AWYXBly1fogsgo59jwj30q80bjq38.jpg)
 
     因为刚运行完malloc，note_chunk中的*content以及content_chunk中的值仍为空
 
   - 断点下到addNote函数的最后一句，运行到该句再次观察内存数据
 
-    ![](http://ww1.sinaimg.cn/large/006AWYXBly1foita9yipcj30ob0saqga.jpg)
+    ![](http://ww1.sinaimg.cn/large/006AWYXBly1fon4ofpavdj30nq0s94bl.jpg)
 
     这时，第一次addNote就完成了，note_chunk的\*print存储了output函数的地址(0x0804862b)，\*content存储了content_chunk的data地址，content_chunk的data区存储了我们第一次输入的"aaa\n"
 
   - **继续运行程序，到第二次addNote函数的最后一句**，再次查看内存中的数据
 
-    ![](http://ww1.sinaimg.cn/large/006AWYXBly1foitb7waylj30ky075adr.jpg)
+    ![](http://ww1.sinaimg.cn/large/006AWYXBly1fon4p2j95uj30l6071tcf.jpg)
 
     这时，内存中存在4个chunk，两个大小（不包括meta data）为8的note_chunk和两个大小为24的content_chunk
 
   - **在两处调用free的地方下断点，运行**
+
+    ![](http://ww1.sinaimg.cn/large/006AWYXBly1fon4pov29mj30hj0qqthw.jpg)
+
+    ​
+
+    ​
+
+    ​
 
     ​
 
