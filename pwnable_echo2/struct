@@ -1,0 +1,8 @@
+struct O
+{
+	char name[24];
+	void (*greet)(char *name);
+	void (*bye)(char *name);
+}
+
+
