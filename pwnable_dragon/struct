@@ -1,0 +1,16 @@
+struct PLAYER
+{
+	int model;
+	int hp;
+	int mp;
+	void (*print)(struct PLAYER p);
+}
+
+struct MONSTER
+{
+	void (*print)(struct MONSTER d);
+	int model;
+	uint8_t hp;
+	uint8_t life;
+	int damage;
+}
