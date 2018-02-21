@@ -1,0 +1,8 @@
+struct notePad
+{
+	void (*show)(struct notePad *note);
+	void (*destory)(struct notePad *note);
+	int rdonly;
+	int size;
+	char *data;
+}
