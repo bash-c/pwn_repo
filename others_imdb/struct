@@ -1,0 +1,8 @@
+struct VIDEO
+{
+	void (*show)(struct VIDEO video);
+	char name[64];
+	char intro[128];
+	float rating;
+	float season;
+}
