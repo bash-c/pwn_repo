@@ -1,0 +1,11 @@
+struct WEREWOLF
+{
+	int hp;
+	char *name;
+}
+
+struct BULLET
+{
+	char des[0x30];
+	int power;
+}
