@@ -1,0 +1,8 @@
+struct ITEM
+{
+	char *name;
+	int prize;
+	struct ITEM *fd;
+	struct ITEM *bk;
+}
+
