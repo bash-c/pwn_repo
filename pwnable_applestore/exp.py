@@ -33,11 +33,16 @@ def getIP8():
         io.sendlineafter("> ", "2")
         io.sendlineafter("> ", "2")
 
-def checkout():
+def checkout(payload):
     io.sendlineafter("> ", "5")
+    io.sendlineafter("> ", payload)
 
 def listCart():
     io.sendlineafter("> ", "4")
+    io.sendlineafter("> ", "y")
+
+def getLibc():
+
 
 if __name__ == "__main__":
     getIP8()
