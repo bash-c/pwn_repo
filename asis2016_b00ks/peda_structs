@@ -1,0 +1,8 @@
+struct BOOK
+{
+	int id;
+	char *name;
+	char *description;
+	int descSize;
+}
+
