@@ -1,0 +1,6 @@
+struct CHUNK
+{
+	int count;
+	int time;
+	char *name;
+}
