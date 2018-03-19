@@ -1,6 +1,6 @@
-# hackme.inndy.tw的一些Writeup（1月31日更新）
+# hackme.inndy.tw的一些Writeup（3月19日更新）
 
-> 转载请表明出处：http://www.cnblogs.com/WangAoBo/p/7706719.html
+> 原文链接：http://www.cnblogs.com/WangAoBo/p/7706719.html
 
 推荐一下https://hackme.inndy.tw/scoreboard/，上边有一些很好的针对新手的题目，但网上能搜到的Writeup很少，因此开了这篇博文记录一下部分目前解出的题目（主要是pwn和re），以后会跟着解题进度的推进逐步更新，同时遵循inndy师傅的规矩，只放思路，不放flag。
 
@@ -10,11 +10,11 @@
 
 ## pwn
 
-#### 0x00 catflag
+###0x00 catflag
 
 送分题，nc连接，cat flag即可
 
-#### 0x01 homework
+### 0x01 homework
 
 根据题目提示，是数组越界的漏洞，第一次遇到这种漏洞觉得利用方式很巧妙。通过搜索字符串发现了get shell的函数**call_me_maybe**, **run_program**函数中定义了一个大小为10的数组，漏洞出现在**edit number**的选项里，当我们输入的**index**大于10时，程序是不会报错的，而是会继续朝着高地址**edit**数据，因此只需要**edit** **run_program**栈中的**ret**为**call_me_maybe**, 这样当我们退出**run_program**函数时，程序就会返回到**call_me_maybe**函数来**get_shell**，原理图如下：
 
@@ -31,7 +31,7 @@
 
 
 
-#### 0x02 ROP
+### 0x02 ROP
 
 刚看这道题的时候觉得无从下手，程序中既没有可以利用的函数，通过file命令查看是静态链接的也不能利用libc中的函数。后来注意到下一题提到了**ROPgadget**这个工具，才想到可以直接利用**ROPgadget**直接拼凑出ROP链，如下：
 
@@ -45,7 +45,7 @@
 
 
 
-#### 0x03 ROP2
+### 0x03 ROP2
 
 本来根据提示以为这道题需要自己拼凑出ropchain，但后来发现这一题中存在**syscall**这个可以实现系统调用的函数，如**syscall(4, 1, &v4, 42)**即相当于**write(1, &v4, 42)**，**syscall(3, 0, &v1, 1024)**即相当于**read(0, &v1, 1024)**，syscall的第一个参数是系统函数的系统调用号，之后的参数依次为对应函数的参数，32位的系统调用号定义在**/usr/include/x86_64-linux-gnu/asm/unistd_32.h**中，可以看到execve的调用号为11，因此如果我们构造**syscall(11, "/bin/sh", 0, 0)**就相当于执行了**execve("/bin/sh", 0, 0)**即可get shell
 
@@ -73,11 +73,11 @@
 
 
 
-#### 0x04 toooomuch
+### 0x04 toooomuch
 
 放松心情的题，用IDA很容易可以得到通过验证的passcode，然后用 二分/XJB猜 猜对数字后，就可以拿到flag
 
-#### 0x05 toooomuch-2
+### 0x05 toooomuch-2
 
 题目已经提示利用缓冲区溢出通过shellcode来get shell，IDA查看程序流程，在gets函数中存在溢出
 
@@ -91,7 +91,7 @@
 
 
 
-#### 0x06 echo
+### 0x06 echo
 
 看到echo，第一反应就是格式化字符串的题，分析文件后果然发现了很明显的格式化字符串漏洞
 
@@ -105,7 +105,7 @@
 
 >  需要注意如果leak的payload是**p32(system_got) + "%7$s"**的形式，那么泄露出的system_addr是从第4位到第8位（p32(system_got))占据了前4位，另外如果p32(system_got)中有\x00等bad char截断printf的话，可以调整payload形式为**%8$s + p32(system_got)**
 
-#### 0x07 echo2
+### 0x07 echo2
 
 很明显这一题也是格式化字符串的漏洞,与上一题的不同在于:
 
@@ -131,7 +131,7 @@ def getAddr():
 
 获得elf_base与libc_base基址后,按照正常的格式化字符串思路来就行,比如可以用one_gadget地址覆写exit函数的got表地址.
 
-#### 0x08 smash-the-stack
+### 0x08 smash-the-stack
 
 典型的canary leak，覆盖\__libc_argv[0]为flag在内存中地址，触发__stack_chk_fail函数即可泄露flag
 
@@ -149,7 +149,7 @@ def getAddr():
 
 > 需要注意的是write函数的长度是由用户输入决定的，给buf一个较小的值即可
 
-#### 0x09 onepunch
+### 0x09 onepunch
 
 > 本来以为onepunch的意思是构造好payload一发get shell， 后来才发现是一个字节一个字节的打
 
@@ -177,7 +177,7 @@ def getAddr():
 >
 > ![](https://ws1.sinaimg.cn/large/006AWYXBly1fnt64pqggxj30tc0chq39.jpg)
 
-#### 0x0A rsbo 
+### 0x0A rsbo
 
 这道题的利用方法倒是第一次见到，对于read和write的第一个参数fd（文件描述符），fd = 0时代表标准输入stdin，1时代表标准输出stdout，2时代表标准错误stderr，**3~9则代表打开的文件**。这一题的利用方式利用方式就是利用rop先用open函数打开位于/home/rsbo/的flag，然后再用read(3, )把flag写到一个固定地址上，最后用write输出
 
@@ -185,7 +185,7 @@ def getAddr():
 
 ![](https://ws1.sinaimg.cn/large/006AWYXBly1fkq4vt2qwfj30so0800ty.jpg)
 
-#### 0x0B leave_msg
+### 0x0B leave_msg
 
 经过分析代码的逻辑,绕过下边的限制,就可以覆写got表:
 
@@ -203,7 +203,7 @@ if ( v4 <= 64 && nptr != 45 )
 
 > 至于0x36是怎么来的,我是调试看出来的,如果哪位表哥有静态计算的方法,还请不吝赐教!
 
-#### 0x0C stack
+### 0x0C stack
 
 这个题开了全保护，第一眼看上去挺吓人，但其实漏洞很容易发现，pop时并没有对下标作出检查，这就意味着我们可以通过一直pop利用数组越界从栈上leak，先通过调试看栈结构
 
@@ -262,25 +262,22 @@ def getBase():
 
       以前我调试开启了PIE保护elf的方式是Uriel师傅教我的先找elf装载基址
 
-      ```python
-      from pwn import *
-      import sys, os
-      import re
+```python
+	from pwn import *
+	import sys, os
+	import re
 
-      wordSz = 4
-      hwordSz = 2
-      bits = 32
-      PIE = 0
-      mypid=0
-
-
-      context(arch='amd64', os='linux', log_level='debug')
-
+	wordSz = 4
+	hwordSz = 2
+	bits = 32
+	PIE = 0
+	mypid=0
+	context(arch='amd64', os='linux', log_level='debug')
       def leak(address, size):
          with open('/proc/%s/mem' % mypid) as mem:
             mem.seek(address)
             return mem.read(size)
-
+    
       def findModuleBase(pid, mem):
          name = os.readlink('/proc/%s/exe' % pid)
          with open('/proc/%s/maps' % pid) as maps:
@@ -300,7 +297,7 @@ def getBase():
                      return addr
          log.failure("Module's base address not found.")
          sys.exit(1)
-
+    
       def debug(addr = 0):
           global mypid
           mypid = proc.pidof(r)[0]
@@ -308,19 +305,19 @@ def getBase():
           with open('/proc/%s/mem' % mypid) as mem:
               moduleBase = findModuleBase(mypid, mem)
               gdb.attach(r, "set follow-fork-mode parent\nb *" + hex(moduleBase+addr))    
-      ```
+```
 
-      但做这道题题时发现pwn.gdb.attach只有第一个参数是必须的
+但做这道题题时发现pwn.gdb.attach只有第一个参数是必须的
 
-      ![](https://ws1.sinaimg.cn/large/006AWYXBly1fnziwaesg0j30og0m7k21.jpg)
+![](https://ws1.sinaimg.cn/large/006AWYXBly1fnziwaesg0j30og0m7k21.jpg)
 
-      这样就可以先进入gdb，通过vmmap找到elf基址后在下断点进行调试了
+这样就可以先进入gdb，通过vmmap找到elf基址后在下断点进行调试了
 
-      ![](https://ws1.sinaimg.cn/large/006AWYXBly1fnziz8gnhoj309j02iaag.jpg)
+![](https://ws1.sinaimg.cn/large/006AWYXBly1fnziz8gnhoj309j02iaag.jpg)
 
-      ![](https://ws1.sinaimg.cn/large/006AWYXBly1fnziyk9lebj30qj0eqtio.jpg)
+![](https://ws1.sinaimg.cn/large/006AWYXBly1fnziyk9lebj30qj0eqtio.jpg)
 
-#### 0x0D very_overflow
+### 0x0D very_overflow
 
 这个题目给了源码，分析起来方便了不少。这个题的漏洞也很容易发现，虽然申请了长度为128*(sizeof(buffer))的缓冲区，但可以无限的add_note，这就意味着我们可以先重复add_note耗尽缓冲区，然后继续add_note和show_note时，就可以leak类似__libc_start_main这些信息来确定libc装载基址了，有了libc装载基址后，通过rop构造system("/bin/sh")或者one_gadget都可以求解
 
@@ -330,7 +327,7 @@ def getBase():
 
 另外就是刚开始本地可以get shell，但远程连接很容易超时，后来把context.log_level换成了info，减少了打印花费的时间，又把io.sendlineafter换成了直接io.sendline，就不容易超时了
 
-#### 0x0E tictactoe-1
+### 0x0E tictactoe-1
 
 给的elf文件逆起来比较繁琐，通过反编译可以找到棋的源码，了解了程序的大体流程后，可以发现在落子时可以通过数组越界覆写GOT表
 
@@ -344,15 +341,15 @@ def getBase():
 
 
 
-### reverse
+## reverse
 
-#### 0x00 helloworld:
+### 0x00 helloworld:
 
-#### 0x01 simple:
+### 0x01 simple:
 
 都是水题，不再细说
 
-#### 0x03 pyyy
+### 0x03 pyyy
 
 这一题用uncomplye6或者在线网站反编译后，得到的python代码都有大量的lambda操作，读起来十分费力，并且代码不能直接运行，仔细观察，代码中有一行
 
@@ -421,7 +418,7 @@ print ''.join((gg[Y(fun)(i + 2)] for i in range(16))) % ''.join((data[pow((gcd(z
 
 运行即可
 
-#### 0x04 gccc
+### 0x04 gccc
 
 该题的逻辑很简单,只有一个输入,下载文件后发现gccc.exe为.Net(C#)架构,因此用C#的反编译工具(这里用了)反编译得到题目代码如下:
 
@@ -665,7 +662,7 @@ namespace GrayCCC
 
 
 
-#### 0x05 ccc
+### 0x05 ccc
 
 IDA F5后程序的流程很清楚，唯一一处有困惑的是不知道下图中的crc32函数是按照什么规则加密的并且返回值是什么
 
@@ -733,7 +730,7 @@ while True:
 
 
 
-#### 0x06 bitx
+### 0x06 bitx
 
 IDA中可以看到，输入是与0x804A040地址上的一组数据进行比较的（IDA伪代码页，右键，Hide casts可以隐藏数据类型，看起来美观不少），程序逻辑很简单，直接放脚本
 
@@ -759,7 +756,7 @@ for i in xrange(42):
 print ans
 ```
 
-#### 0x07 2018-rev
+### 0x07 2018-rev
 
 这个我也不知道用的是不是预期解。
 
@@ -805,7 +802,7 @@ done
 
 这个题好像是文件放错了，最后的flag不完全正确，但很容易能猜出正确的flag
 
-#### 0x08 what-the-hell
+### 0x08 what-the-hell
 
 这个题有点意思,看题目的提示好像是要优化算法,但我用了非预期解.我把思路和写残了的代码放出来,供大家参考.
 
@@ -927,9 +924,57 @@ if __name__ == "__main__":
 
 
 
-### Crypto
+### 0x09 mov
 
-#### 0x00 xor
+这个题前前后后做了好几个月，后来发现是我想麻烦了，先说一下我做这道题的历程
+
+1.  IDA打开之后看到一堆mov，根据提示*`MOV` instruction is turing complete!*很容易google到这是[movfuscator混淆](https://github.com/xoreaxeaxeax/movfuscator)，同时找到了去混淆的工具[demovfuscator](https://github.com/kirschju/demovfuscator)，安装后（不是太好装）发现去混淆的效果并不理想，生成的CG也似乎有问题
+
+2.  又google到类似题目的writeup，有使用[qira](http://blog.csdn.net/charlie_heng/article/details/79206863)，有使用[perf](https://r00tus3r.wordpress.com/2017/02/07/alex-ctf-2017/)，有使用[pin](https://github.com/TeamContagion/CTF-Write-Ups/tree/master/AlexCTF-2017/Reversing/RE5%20-%20Packed%20Movement%20%28350%29)，有直接从[内存](http://www.leommxj.com/2017/02/08/AlexCTF-Writeup/)中抠出来的，因为最近在看fuzz的一些东西，所以想尝试使用pin解题目
+
+3.  大致了解了pin的工作原理后，安装好环境，开始找输入对输出的影响，这时偶然发现一个bug，输入n位字符时，这n位与flag的前n位相等即可，可利用这个特性爆破
+
+    ![](http://ww1.sinaimg.cn/large/006AWYXBly1fphzg1swirj309j07e3zu.jpg)
+
+    爆破脚本
+
+    ```python
+    inndy_mov [master●] cat solve.py 
+    #!/usr/bin/env python
+    # -*- coding: utf-8 -*-
+    __Auther__ = 'M4x'
+
+    from subprocess import Popen, PIPE
+    from string import printable
+
+    ans = "FLAG{"
+    while True:
+        if "}" in ans:
+            print ans
+            break
+
+        
+        for c in printable:
+            f = Popen("./mov", shell = True, stdin = PIPE, stdout = PIPE)
+            tmp = ans + c
+            f.stdin.write(tmp + "\n")
+            
+            stdout, stderr = f.communicate()
+            if "Good" in stdout:
+                ans = tmp
+                print ans
+                break
+    ```
+
+    实际效果也很好，不到2s就爆破出了flag
+
+    ![](http://ww1.sinaimg.cn/large/006AWYXBly1fphzjhm2enj30je0j1gs5.jpg)
+
+觉得使用pin的方法很巧妙，以后再补上使用pin的wp
+
+## Crypto
+
+### 0x00 xor
 
 zwhubuntu师傅告诉我这题可以用xortool解，项目地址https://github.com/hellman/xortool
 
@@ -937,7 +982,7 @@ zwhubuntu师傅告诉我这题可以用xortool解，项目地址https://github.c
 
 ![](https://ws1.sinaimg.cn/large/006AWYXBly1fkr5bufy5mj30hy0fl125.jpg)
 
-####0x01 ffa
+### 0x01 ffa
 
 这个题就只想说z3大法好了。
 
