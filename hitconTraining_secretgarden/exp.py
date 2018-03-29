@@ -8,10 +8,10 @@ import sys
 context.log_level = "debug"
 context.terminal = ["deepin-terminal", "-x", "sh", "-c"]
 if sys.argv[1] == "l": 
-    io = process("./secretgarden") 
+    io = process("./secretgarden", {"LD_PRELOAD": "./libc-2.23.so"}) 
     elf = ELF("./secretgarden")
     #  libc = ELF("/lib/i386-linux-gnu/libc.so.6")
-    libc = ELF("/lib/x86_64-linux-gnu/libc.so.6")
+    #  libc = ELF("/lib/x86_64-linux-gnu/libc.so.6")
 
 else:
     io = remote("localhost", 9999)
