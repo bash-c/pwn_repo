@@ -73,7 +73,7 @@ def shell(libc_base):
     printNote(0)
 
 if __name__ == "__main__":
-    DEBUG()
+    #  DEBUG()
     shell(leak())
     io.interactive()
     io.close()
