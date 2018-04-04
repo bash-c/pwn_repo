@@ -10,9 +10,8 @@ context.log_level = "debug"
 context.terminal = ["deepin-terminal", "-x", "sh", "-c"]
 
 if sys.argv[1] == "l":
-    io = process("./hacknote")
-    elf = ELF("./hacknote")
-    libc = ELF("/lib/i386-linux-gnu/libc.so.6")
+    io = process("./hacknote", env = {"LD_PRELOAD": "./libc_32.so.6"})
+    libc = ELF("/usr/lib32/libc.so.6")
 
 else:
     io = remote("chall.pwnable.tw", 10102)
