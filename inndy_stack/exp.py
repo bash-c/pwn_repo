@@ -6,12 +6,12 @@ from pwn import *
 from time import sleep
 import sys
 context.log_level='debug'
-context.terminal = ["deepin-terminal", "-x", "sh", "-c"]
+context.terminal = ["xfce4-terminal", "-x", "sh", "-c"]
 
 if sys.argv[1] == "l":
-    io = process("./stack")
+    io = process("./stack", env = {"LD_PRELOAD": "./libc-2.23.so.i386"})
     elf = ELF("./stack")
-    libc = ELF("/lib/i386-linux-gnu/libc.so.6")
+    libc = ELF("./libc-2.23.so.i386")
     one_gadget_offset = 0x3a9fc
 
 else:
