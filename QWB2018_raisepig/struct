@@ -1,0 +1,6 @@
+struct PIG
+{
+	int inuse;
+	char *name;
+	char type[24];
+}
