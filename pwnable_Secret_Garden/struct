@@ -1,0 +1,6 @@
+struct FLOWER
+{
+	int inuse;
+	char *name;
+	char color[24];
+}
