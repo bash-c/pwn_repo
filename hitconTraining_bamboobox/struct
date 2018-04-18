@@ -1,0 +1,5 @@
+struct ITEM
+{
+	int len;
+	char *name;
+}
