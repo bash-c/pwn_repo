@@ -1,0 +1,7 @@
+struct CHUNK
+{
+	struct CHUNK *printInfo;	//0
+	char *name;					//8
+	int nameLen;				//16
+	int punch;					//24
+}
