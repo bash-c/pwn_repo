@@ -1,0 +1,17 @@
+t_entry 
+{
+	char name[32];
+	char phone_number[16];
+}
+
+t_node
+{
+	fn_cleanup cleanup;
+	t_node *next;
+	t_entry entry;
+}
+
+fn_cleanup void (*)(t_node *)
+
+
+
