@@ -1,0 +1,7 @@
+struct NOTE
+{
+	char name[0x10];
+	int inuse;
+	char *content;
+
+}
