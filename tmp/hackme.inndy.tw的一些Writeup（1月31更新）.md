@@ -1,4 +1,4 @@
-# hackme.inndy.tw的一些Writeup（3月19日更新）
+# hackme.inndy.tw的一些Writeup（5月15日更新）
 
 > 原文链接：http://www.cnblogs.com/WangAoBo/p/7706719.html
 
@@ -1121,6 +1121,60 @@ if __name__ == "__main__":
 ![](https://ws1.sinaimg.cn/large/006AWYXBly1fntrmcv0rtj30t705378b.jpg)
 
 > OwO多了一步求flag的过程，计算时间反而更短了，看来计算时间还是跟CPU的心情有关系
+
+## Programming
+
+### fast
+
+ppc类型的题目，注意数据范围在int32范围内即可，同时注意如果使用pwntools写socket的话，没有必要recvuntil后再send，完全可以现将所有的输入输出都存到缓冲区中，最后一次性send，具体看脚本
+
+```python
+inndy_fast [master] cat exp.py 
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+__Auther__ = 'M4x'
+
+from pwn import *
+from numpy import int32
+import time
+import re
+#  context.log_level = 'debug'
+
+#  io = process("./fast")
+io = remote("hackme.inndy.tw", 7707)
+
+io.sendlineafter("the game.\n", "Yes I know")
+
+ans = ""
+res = ""
+f = lambda x: int32(int(x))
+for i in xrange(10000):
+    n1, op, n2 = io.recvuntil("=", drop = True).strip().split(' ')
+    #  print n1, op, n2
+    io.recvline()
+
+    if op == '+':
+        #  print n1, op, n2
+        ans = str(f(n1) + f(n2))
+    if op == '-':
+        ans = str(f(n1) - f(n2))
+    if op == '*':
+        ans = str(f(n1) * f(n2))
+    if op == '/':
+        ans = str(int(float(n1) / int(n2)))
+
+    res += (ans + " ")
+
+#  print res
+io.sendline(res)
+io.interactive()
+io.close()
+```
+
+
+
+
+
 
 
 
