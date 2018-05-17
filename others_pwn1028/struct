@@ -1,0 +1,6 @@
+struct good
+{
+	char name[8];
+	int number;
+	float price;
+}
