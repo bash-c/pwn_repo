@@ -45,7 +45,7 @@ def edit(idx, data):
     io.sendafter("data\n", data)
 
 if __name__ == "__main__":
-    DEBUG("b *0x4009C2\nc")
+    #  DEBUG("b *0x4009C2\nc")
     create(0xf0, '0' * 0xf0)
     create(0xf0, '1' * 0xf0)
     create(0xf0, '2' * 0xf0)
