@@ -1,12 +1,14 @@
-# hackme.inndy.tw的一些Writeup（5月19日更新）
+# hackme.inndy.tw的一些Writeup（5月30日更新）
 
 > 原文链接：http://www.cnblogs.com/WangAoBo/p/7706719.html
 
 推荐一下https://hackme.inndy.tw/scoreboard/，上边有一些很好的针对新手的题目，但网上能搜到的Writeup很少，因此开了这篇博文记录一下部分目前解出的题目（主要是pwn和re），以后会跟着解题进度的推进逐步更新，同时遵循inndy师傅的规矩，只放思路，不放flag。
 
-> zwhubuntu师傅的部分题解：http://wxzwhubuntu.club:8088/index.php/2017/06/14/inndy/
+> ~~zwhubuntu师傅的部分题解：http://wxzwhubuntu.club:8088/index.php/2017/06/14/inndy/~~
 >
 > 聂师傅的部分题解: http://blog.csdn.net/niexinming
+>
+> 如果看了解题思路仍有问题，可以在我的github找到完整的脚本：[pwn](https://github.com/M4xW4n9/pwn_repo)，[reverse](https://github.com/M4xW4n9/reverse_repo)，欢迎star和follow
 
 ## pwn
 
