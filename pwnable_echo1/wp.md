@@ -1,6 +1,6 @@
 # pwnable.kr - echo1 - writeup
 
->   原文链接：
+>   原文链接：https://www.cnblogs.com/WangAoBo/p/pwnable_kr_echo1.html
 
 旧题新做，发现这道题能用不少姿势
 
