@@ -13,7 +13,8 @@ if sys.argv[1] == "l":
     # env = {'LD_PRELOAD': ''}
     # io = process("", env = env)
     #  io = process("./pwn_redhat")
-    io = process("./pwn_redhat_patch_2free")
+    #  io = process("./pwn_redhat_patch_2free")
+    io = process("./pwn_redhat_patch_printf")
     libc = elf.libc
 
 

