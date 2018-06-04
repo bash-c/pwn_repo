@@ -9,4 +9,4 @@ for i in xrange(0xffff):
     allrand.append(f(i))
 
 for i in set(allrand):
-    print "{:#x}\t{}".format(i, allrand.count(i))
+    print "{:#x}\t{}\t{}".format(i, allrand.count(i), float(allrand.count(i)) / sum(set(allrand)))
