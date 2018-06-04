@@ -1,4 +1,4 @@
-# hackme.inndy.tw的一些Writeup（5月30日更新）
+# hackme.inndy.tw的一些Writeup（6月3日更新）
 
 > 原文链接：http://www.cnblogs.com/WangAoBo/p/7706719.html
 
@@ -133,7 +133,13 @@ def getAddr():
 
 获得elf_base与libc_base基址后,按照正常的格式化字符串思路来就行,比如可以用one_gadget地址覆写exit函数的got表地址.
 
-### 0x08 smash-the-stack
+### 0x08 echo3
+
+这个题在和站主交流后发现我使用了非预期的解法，不太容易说清楚，最近比较忙，先不说原理了，忙过这一阵写一下对这道题的详细分析（估计要几个月后了），脚本如下：
+
+[inndy_echo3_](https://github.com/M4xW4n9/pwn_repo/blob/master/inndy_echo3/exp.py)
+
+### 0x09 smash-the-stack
 
 典型的canary leak，覆盖\__libc_argv[0]为flag在内存中地址，触发__stack_chk_fail函数即可泄露flag
 
@@ -151,7 +157,7 @@ def getAddr():
 
 > 需要注意的是write函数的长度是由用户输入决定的，给buf一个较小的值即可
 
-### 0x09 onepunch
+### 0x0A onepunch
 
 > 本来以为onepunch的意思是构造好payload一发get shell， 后来才发现是一个字节一个字节的打
 
@@ -179,7 +185,7 @@ def getAddr():
 >
 > ![](https://ws1.sinaimg.cn/large/006AWYXBly1fnt64pqggxj30tc0chq39.jpg)
 
-### 0x0A rsbo
+### 0x0B rsbo
 
 这道题的利用方法倒是第一次见到，对于read和write的第一个参数fd（文件描述符），fd = 0时代表标准输入stdin，1时代表标准输出stdout，2时代表标准错误stderr，**3~9则代表打开的文件**。这一题的利用方式利用方式就是利用rop先用open函数打开位于/home/rsbo/的flag，然后再用read(3, )把flag写到一个固定地址上，最后用write输出
 
@@ -187,7 +193,7 @@ def getAddr():
 
 ![](https://ws1.sinaimg.cn/large/006AWYXBly1fkq4vt2qwfj30so0800ty.jpg)
 
-### 0x0B leave_msg
+### 0x0C leave_msg
 
 经过分析代码的逻辑,绕过下边的限制,就可以覆写got表:
 
@@ -205,7 +211,7 @@ if ( v4 <= 64 && nptr != 45 )
 
 > 至于0x36是怎么来的,我是调试看出来的,如果哪位表哥有静态计算的方法,还请不吝赐教!
 
-### 0x0C stack
+### 0x0D stack
 
 这个题开了全保护，第一眼看上去挺吓人，但其实漏洞很容易发现，pop时并没有对下标作出检查，这就意味着我们可以通过一直pop利用数组越界从栈上leak，先通过调试看栈结构
 
@@ -319,7 +325,7 @@ def getBase():
 
 ![](https://ws1.sinaimg.cn/large/006AWYXBly1fnziyk9lebj30qj0eqtio.jpg)
 
-### 0x0D very_overflow
+### 0x0E very_overflow
 
 这个题目给了源码，分析起来方便了不少。这个题的漏洞也很容易发现，虽然申请了长度为128*(sizeof(buffer))的缓冲区，但可以无限的add_note，这就意味着我们可以先重复add_note耗尽缓冲区，然后继续add_note和show_note时，就可以leak类似__libc_start_main这些信息来确定libc装载基址了，有了libc装载基址后，通过rop构造system("/bin/sh")或者one_gadget都可以求解
 
@@ -329,7 +335,7 @@ def getBase():
 
 另外就是刚开始本地可以get shell，但远程连接很容易超时，后来把context.log_level换成了info，减少了打印花费的时间，又把io.sendlineafter换成了直接io.sendline，就不容易超时了
 
-### 0x0E tictactoe-1
+### 0x0F tictactoe-1
 
 给的elf文件逆起来比较繁琐，通过反编译可以找到棋的源码，了解了程序的大体流程后，可以发现在落子时可以通过数组越界覆写GOT表
 
