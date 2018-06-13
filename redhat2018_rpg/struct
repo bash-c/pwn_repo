@@ -1,0 +1,8 @@
+struct hero
+{
+	char *name;
+	int HP;
+	int Demage;
+	int Armor;
+	char *des;
+}
