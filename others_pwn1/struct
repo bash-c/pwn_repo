@@ -1,0 +1,7 @@
+struct BOOK
+{
+	char name[72];
+	char *desc;
+	int nop[2];
+	long long cnt;
+}
