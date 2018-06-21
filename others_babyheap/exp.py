@@ -132,7 +132,7 @@ if __name__ == "__main__":
 
 
     #  DEBUG([0xC73], True)
-    New('getshell')
+    New('getshell\0\n')
 
     io.interactive()
     io.close()
