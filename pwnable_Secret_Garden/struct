@@ -4,3 +4,5 @@ struct FLOWER
 	char *name;
 	char color[24];
 }
+
+struct FLOWER *flower[0x63];
