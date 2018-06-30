@@ -1,0 +1,7 @@
+struct HEAP
+{
+	struct HEAP* next;
+	char title[64];
+	int size;
+	char cont[size];
+}
