@@ -10,7 +10,7 @@ import sys
 elfPath = "./notepad"
 libcPath = "./libc-2.23.so.i386"
 remoteAddr = "hackme.inndy.tw"
-remotePort = 7705
+remotePort = 7713
 
 context.binary = elfPath
 context.terminal = ["deepin-terminal", "-x", "sh", "-c"]
