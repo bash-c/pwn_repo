@@ -3,6 +3,6 @@ struct HACKER
 	int id;
 	char name[40];
 	char *something;
-	int age;
 	int gender;
+	int age;
 }
