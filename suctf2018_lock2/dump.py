@@ -52,6 +52,8 @@ def dumpBin(textBase):
         except EOFError:
             f.close()
             io.close()
+            success("dump finished!")
+            break
 
 io = zio(("localhost", 9999), print_write = COLORED(RAW, "yellow"), print_read = COLORED(RAW, "red"))
 
