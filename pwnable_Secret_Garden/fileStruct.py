@@ -10,9 +10,9 @@ import sys
 elfPath = "./secretgarden"
 libcPath = "./libc_64.so.6"
 remoteAddr = "chall.pwnable.tw"
-remoteAddr = "localhost"
+#  remoteAddr = "localhost"
 remotePort = 10203
-remotePort = 9999
+#  remotePort = 9999
 
 context.binary = elfPath
 context.terminal = ["deepin-terminal", "-x", "sh", "-c"]

