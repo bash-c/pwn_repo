@@ -1,0 +1,21 @@
+The files
+	zic.c zdump.c tzfile.h private.h tzselect.ksh
+come from the tzcode package by Arthur David Olson et.al.
+
+The files
+	africa antarctica asia australasia europe
+	northamerica southamerica pacificnew etcetera factory
+	backward systemv solar87 solar88 solar89
+	iso3166.tab zone.tab leapseconds yearistype
+come from the tzdata package by Arthur David Olson et.al.
+
+Please check the ChangeLog files in the top level directory for the
+version of the tzcode and tzdata packages.
+
+Please also see: https://sourceware.org/glibc/wiki/SharedSourceFiles
+
+These packages may be found at ftp://ftp.iana.org/tz/releases/.  Commentary
+should be addressed to tz@iana.org.
+
+The subdirectory testdata contains manually edited data files for
+regression testing purposes.

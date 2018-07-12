@@ -1,0 +1,99 @@
+# Copyright (C) 2016-2017 Free Software Foundation, Inc.
+# This file is part of the GNU C Library.
+
+# The GNU C Library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+
+# The GNU C Library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+
+# You should have received a copy of the GNU Lesser General Public
+# License along with the GNU C Library; if not, see
+# <http://www.gnu.org/licenses/>.
+
+# Allowed attributes for tunables:
+#
+# type: Defaults to STRING
+# minval: Optional minimum acceptable value
+# maxval: Optional maximum acceptable value
+# env_alias: An alias environment variable
+# security_level: Specify security level of the tunable.  Valid values are:
+#
+# 	     SXID_ERASE: (default) Don't read for AT_SECURE binaries and
+# 	     		 removed so that child processes can't read it.
+# 	     SXID_IGNORE: Don't read for AT_SECURE binaries, but retained for
+# 	     		  non-AT_SECURE subprocesses.
+# 	     NONE: Read all the time.
+
+glibc {
+  malloc {
+    check {
+      type: INT_32
+      minval: 0
+      maxval: 3
+      env_alias: MALLOC_CHECK_
+    }
+    top_pad {
+      type: SIZE_T
+      env_alias: MALLOC_TOP_PAD_
+      security_level: SXID_IGNORE
+    }
+    perturb {
+      type: INT_32
+      minval: 0
+      maxval: 0xff
+      env_alias: MALLOC_PERTURB_
+      security_level: SXID_IGNORE
+    }
+    mmap_threshold {
+      type: SIZE_T
+      env_alias: MALLOC_MMAP_THRESHOLD_
+      security_level: SXID_IGNORE
+    }
+    trim_threshold {
+      type: SIZE_T
+      env_alias: MALLOC_TRIM_THRESHOLD_
+      security_level: SXID_IGNORE
+    }
+    mmap_max {
+      type: INT_32
+      env_alias: MALLOC_MMAP_MAX_
+      security_level: SXID_IGNORE
+    }
+    arena_max {
+      type: SIZE_T
+      env_alias: MALLOC_ARENA_MAX
+      minval: 1
+      security_level: SXID_IGNORE
+    }
+    arena_test {
+      type: SIZE_T
+      env_alias: MALLOC_ARENA_TEST
+      minval: 1
+      security_level: SXID_IGNORE
+    }
+    tcache_max {
+      type: SIZE_T
+      security_level: SXID_ERASE
+    }
+    tcache_count {
+      type: SIZE_T
+      security_level: SXID_ERASE
+    }
+    tcache_unsorted_limit {
+      type: SIZE_T
+      security_level: SXID_ERASE
+    }
+  }
+  tune {
+    hwcap_mask {
+      type: UINT_64
+      env_alias: LD_HWCAP_MASK
+      default: HWCAP_IMPORTANT
+      }
+  }
+}

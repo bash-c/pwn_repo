@@ -1,0 +1,17 @@
+libc {
+  GLIBC_2.2.5 {
+    arch_prctl; __arch_prctl;
+
+    ioperm; iopl;
+
+    modify_ldt;
+  }
+}
+
+librt {
+  GLIBC_2.3.3 {
+    # Changed timer_t.
+    timer_create; timer_delete; timer_getoverrun; timer_gettime;
+    timer_settime;
+  }
+}

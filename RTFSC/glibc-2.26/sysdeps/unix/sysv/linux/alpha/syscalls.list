@@ -1,0 +1,45 @@
+# File name	Caller	Syscall name	# args	Strong name	Weak names
+
+sigstack	-	sigstack	2	sigstack
+
+getpriority	-	getpriority	i:ii	__getpriority	getpriority
+
+# proper socket implementations:
+bind		-	bind		i:ipi	__bind		bind
+getpeername	-	getpeername	i:ipp	__getpeername	getpeername
+getsockname	-	getsockname	i:ipp	__getsockname	getsockname
+getsockopt	-	getsockopt	i:iiiBN	__getsockopt	getsockopt
+listen		-	listen		i:ii	__listen	listen
+setsockopt	-	setsockopt	i:iiibn	__setsockopt	setsockopt
+shutdown	-	shutdown	i:ii	__shutdown	shutdown
+socket		-	socket		i:iii	__socket	socket
+socketpair	-	socketpair	i:iiif	__socketpair	socketpair
+
+ptrace		-	ptrace		4	__ptrace	ptrace
+
+# access pci space protected from machine checks:
+pciconfig_read	EXTRA	pciconfig_read	5	pciconfig_read
+pciconfig_write	EXTRA	pciconfig_write	5	pciconfig_write
+pciconfig_iobase EXTRA	pciconfig_iobase 3	__pciconfig_iobase pciconfig_iobase
+
+# support old timeval32 entry points
+osf_gettimeofday -	osf_gettimeofday 2	__gettimeofday_tv32  __gettimeofday@GLIBC_2.0 gettimeofday@GLIBC_2.0
+osf_settimeofday -	osf_settimeofday 2	__settimeofday_tv32  settimeofday@GLIBC_2.0
+osf_getitimer	-	osf_getitimer	2	__getitimer_tv32  getitimer@GLIBC_2.0
+osf_setitimer	-	osf_setitimer	3	__setitimer_tv32  setitimer@GLIBC_2.0
+osf_utimes	-	osf_utimes	2	__utimes_tv32  utimes@GLIBC_2.0
+osf_getrusage	-	osf_getrusage	2	__getrusage_tv32  getrusage@GLIBC_2.0
+osf_wait4	-	osf_wait4	4	__wait4_tv32  wait4@GLIBC_2.0
+
+# support new timeval64 entry points
+gettimeofday	-	gettimeofday	2	__GI___gettimeofday gettimeofday@@GLIBC_2.1 __gettimeofday@@GLIBC_2.1
+settimeofday	-	settimeofday	2	__settimeofday settimeofday@@GLIBC_2.1
+getitimer	-	getitimer	2	__getitimer getitimer@@GLIBC_2.1
+setitimer	-	setitimer	3	__setitimer setitimer@@GLIBC_2.1
+utimes		-	utimes		2	__utimes utimes@@GLIBC_2.1
+getrusage	-	getrusage	2	__getrusage getrusage@@GLIBC_2.1
+wait4		-	wait4		4	__wait4 wait4@@GLIBC_2.1
+
+# avoid 64-bit aliases on 32-bit statfs syscalls
+fstatfs		-	fstatfs		i:ip	__fstatfs	fstatfs
+statfs		-	statfs		i:sp	__statfs	statfs

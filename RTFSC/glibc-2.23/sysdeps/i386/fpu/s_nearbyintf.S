@@ -1,0 +1,24 @@
+/*
+ * Written by J.T. Conklin <jtc@netbsd.org>.
+ * Public domain.
+ */
+/* Adapted for use as nearbyint by Ulrich Drepper <drepper@cygnus.com>.  */
+
+#include <machine/asm.h>
+
+ENTRY(__nearbyintf)
+	flds	4(%esp)
+	subl	$32, %esp
+	cfi_adjust_cfa_offset (32)
+	fnstenv	4(%esp)
+	movl	4(%esp), %eax
+	orl	$0x20, %eax
+	movl	%eax, (%esp)
+	fldcw	(%esp)
+	frndint
+	fldenv	4(%esp)
+	addl	$32, %esp
+	cfi_adjust_cfa_offset (-32)
+	ret
+END (__nearbyintf)
+weak_alias (__nearbyintf, nearbyintf)
