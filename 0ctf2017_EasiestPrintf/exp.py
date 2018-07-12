@@ -11,8 +11,6 @@ context.terminal = ["deepin-terminal", "-x", "sh", "-c"]
 elf = ELF("./EasiestPrintf")
 if sys.argv[1] == "l":
     context.log_level = "debug"
-    # env = {'LD_PRELOAD': ''}
-    # io = process("", env = env)
     io = process("./EasiestPrintf")
     libc = elf.libc
     oneGadget = 0x3a9fc
