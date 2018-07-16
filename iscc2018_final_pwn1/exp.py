@@ -45,6 +45,9 @@ def DEBUG(bps = [], pie = False):
     gdb.attach(io, cmd)
 
 if __name__ == "__main__":
+    '''
+    https://github.com/VulnHub/ctf-writeups/blob/master/2016/sctf/bomb_squad.md
+    '''
     #  DEBUG([0x80487f7])
     io.sendlineafter("number!\n", "8584")
     payload = "[1, 1, 3, 5, 11, 21]"
