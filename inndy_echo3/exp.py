@@ -27,7 +27,8 @@ if sys.argv[1] == "l":
     libc = elf.libc
 
 else:
-    io = remote("hackme.inndy.tw", 7720)
+    #  io = remote("hackme.inndy.tw", 7720)
+    io = remote("localhost", 9999)
     libc = ELF("./libc-2.23.so.i386")
 
 if __name__ == "__main__":
