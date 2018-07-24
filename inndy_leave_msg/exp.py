@@ -5,7 +5,8 @@ __Auther__ = 'M4x'
 from pwn import *
 from time import sleep
 import sys
-context(log_level = "debug", os = "linux", arch = "i386", terminal = ["deepin-terminal", "-x", "sh", "-c"])
+context.binary = "./leave_msg"
+context(log_level = "debug", terminal = ["deepin-terminal", "-x", "sh", "-c"])
 
 def debug():
     addr = raw_input("DEBUG: ")
