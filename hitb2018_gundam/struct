@@ -1,0 +1,6 @@
+struct CHUNK
+{
+	int inuse;
+	char *name;
+	char type[24];
+}
