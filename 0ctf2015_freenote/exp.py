@@ -8,14 +8,9 @@ import sys
 context.log_level = "debug"
 context.terminal = ["deepin-terminal", "-x", "sh", "-c"]
 
-if sys.argv[1] == "l":
-    io = process("./freenote_x64")
-    elf = ELF("./freenote_x64")
-    libc = ELF("/lib/x86_64-linux-gnu/libc.so.6")
-else:
-    io = remote("pwn2.jarvisoj.com", 9886)
-    elf = ELF("./freenote_x64")
-    libc = ELF("./libc-2.19.so")
+io = process("./freenote_x64")
+elf = ELF("./freenote_x64")
+libc = ELF("/lib/x86_64-linux-gnu/libc.so.6")
 
 def listPost():
     io.sendlineafter("choice: ", "1")

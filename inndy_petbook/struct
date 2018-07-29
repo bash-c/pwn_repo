@@ -1,6 +1,0 @@
-struct USER
-{
-	int uid;
-	char name[256];
-	char passwd[256];
-}
