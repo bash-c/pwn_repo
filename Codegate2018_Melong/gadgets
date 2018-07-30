@@ -1,0 +1,9 @@
+Gadgets information
+============================================================
+0x00011bbc : pop {r0, pc}
+0x00010460 : pop {r3, pc}
+0x000105e4 : pop {r4, pc}
+0x00011408 : pop {r4, r5, pc}
+0x0001173c : pop {r4, r5, r6, pc}
+
+Unique gadgets found: 5
