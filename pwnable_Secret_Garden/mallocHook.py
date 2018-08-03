@@ -80,7 +80,7 @@ if __name__ == "__main__":
 
     Remove(1) # 1
     Remove(2) # 2 -> 1
-    #  DEBUG([0xE74], True)
+    DEBUG([0xE74], True)
     Remove(1) # 1 -> 2 -> 1
 
     #  DEBUG([0xCD3], True)
