@@ -9,7 +9,7 @@ import os
 import sys
 
 elfPath = "./starbound"
-libcPath = "./libc_32.so.6"
+libcPath = ""
 remoteAddr = "chall.pwnable.tw"
 remotePort = 10202
 
