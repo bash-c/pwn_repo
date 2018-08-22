@@ -1,0 +1,9 @@
+struct GOOD
+{
+	char name[30];
+	char receiver[34];
+	char *item;
+	char *address;
+	char *a_letter;
+	unsigned int price;
+}
