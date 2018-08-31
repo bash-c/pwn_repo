@@ -5,7 +5,7 @@ __Auther__ = 'M4x'
 from pwn import *
 from time import sleep
 import sys
-# context.terminal = ["deepin-terminal", "-x", "sh", "-c"]
+#  context.terminal = ["deepin-terminal", "-x", "sh", "-c"]
 
 elf = ELF("./echo3")
 if sys.argv[1] == "l":
@@ -14,16 +14,16 @@ if sys.argv[1] == "l":
     # io = process("", env = env)
     io = process("./echo3")
     #  io = gdb.debug("./echo3", gdbscript = '''
-    #          b *0x8048774
-    #          b *0x8048646
-    #          c
-    #          set $eax=0x20
-    #          c
-    #          c
-    #          c
-    #          c
-    #          c
-    #          ''')
+            #  b *0x8048774
+            #  b *0x8048646
+            #  c
+            #  set $eax=0x20
+            #  c
+            #  c
+            #  c
+            #  c
+            #  c
+            #  ''')
     libc = elf.libc
 
 else:
