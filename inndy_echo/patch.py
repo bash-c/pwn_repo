@@ -11,10 +11,12 @@ def replace_free(pt):
     new_printf = pt.inject(c = r'''
     void fix_printf(char *fmt)
     {
-        for(int i = 0; fmt[i]; i++)
+        for(int i = 0; i < strlen(fmt) - 1; i++)
         {
-            if(fmt[i] == 'n')
-                fmt[i] = 'p';
+            if(fmt[i] == 'h' && fmt[i + 1] == 'n')
+            {
+                fmt[i + 1] = 'h';
+            }
         }
     }
     ''')
