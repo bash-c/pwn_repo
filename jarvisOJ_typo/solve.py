@@ -7,7 +7,8 @@ import sys
 import pdb
 #  context.log_level = "debug"
 
-for i in range(100, 150)[::-1]:
+#  for i in range(100, 150)[::-1]:
+for i in range(112, 123):
     if sys.argv[1] == "l":
         io = process("./typo", timeout = 2)
     elif sys.argv[1] == "d":
