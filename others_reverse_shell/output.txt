@@ -1,0 +1,1 @@
+Since open() returns 1 and puts() triggers write(1,....), this message will be written to the file output.txt
