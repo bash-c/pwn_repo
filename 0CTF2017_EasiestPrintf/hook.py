@@ -23,7 +23,7 @@ else:
     ncat -vc "LD_PRELOAD=./libc_so ./EasiestPrintf" -kl 127.0.0.1 9999
     '''
     io = remote("localhost", 9999)
-    libc = ELF("./libc_so")
+    libc = ELF("./libc.so.6_0ed9bad239c74870ed2db31c735132ce")
     oneGadget = 0x3ac5c
 
 
