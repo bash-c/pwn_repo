@@ -1,0 +1,15 @@
+struct NODE
+{
+  int userhp;
+  int nop1;
+  _DWORD nop2;
+  bool d1;
+  bool d2;
+  bool d3;
+  int level;
+  _QWORD bosshp;
+  char skill[32];
+  _QWORD nop4;
+  _QWORD demage;
+};
+
