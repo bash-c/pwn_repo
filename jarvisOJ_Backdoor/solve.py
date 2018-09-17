@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-__Auther__ = 'M4x'
 
 from hashlib import sha256
 from libnum import n2s
