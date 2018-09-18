@@ -54,7 +54,7 @@ if __name__ == "__main__":
     execsc(asm("mov r14, rsp; ret"))
 
     add_r14 = asm("inc r14; ret")
-    for i in xrange(64):
+    for i in xrange(0x40):
         execsc(add_r14)
     execsc(asm("mov r14, [r14]; ret"))
 
