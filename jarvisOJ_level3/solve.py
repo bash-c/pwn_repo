@@ -12,7 +12,7 @@ if sys.argv[1] == 'l':
     libc = elf.libc
 
 else:
-    io = remote("pwn2.jarvisoj.com")
+    io = remote("pwn2.jarvisoj.com", 9880)
     libc = ELF("./libc-2.19.so")
 
 if __name__ == "__main__":
