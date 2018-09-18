@@ -1,0 +1,7 @@
+struct NODE
+{
+	char *name;
+	char *type;
+	void (*method)();
+	int len;
+}
