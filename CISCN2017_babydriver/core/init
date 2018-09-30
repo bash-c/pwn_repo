@@ -1,0 +1,20 @@
+#!/bin/sh
+ 
+mount -t proc none /proc
+mount -t sysfs none /sys
+mount -t devtmpfs devtmpfs /dev
+chown root:root flag
+chmod 400 flag
+exec 0</dev/console
+exec 1>/dev/console
+exec 2>/dev/console
+
+insmod /lib/modules/4.4.72/babydriver.ko
+chmod 777 /dev/babydev
+echo -e "\nBoot took $(cut -d' ' -f1 /proc/uptime) seconds\n"
+setsid cttyhack setuidgid 1000 sh
+
+umount /proc
+umount /sys
+poweroff -d 0  -f
+
