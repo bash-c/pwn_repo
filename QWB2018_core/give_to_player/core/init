@@ -1,0 +1,25 @@
+#!/bin/sh
+mount -t proc proc /proc
+mount -t sysfs sysfs /sys
+mount -t devtmpfs none /dev
+/sbin/mdev -s
+mkdir -p /dev/pts
+mount -vt devpts -o gid=4,mode=620 none /dev/pts
+chmod 666 /dev/ptmx
+cat /proc/kallsyms > /tmp/kallsyms
+echo 1 > /proc/sys/kernel/kptr_restrict
+echo 1 > /proc/sys/kernel/dmesg_restrict
+ifconfig eth0 up
+udhcpc -i eth0
+ifconfig eth0 10.0.2.15 netmask 255.255.255.0
+route add default gw 10.0.2.2 
+insmod /core.ko
+
+# setsid /bin/cttyhack setuidgid 1000 /bin/sh
+setsid /bin/cttyhack setuidgid 0 /bin/sh
+
+echo 'sh end!\n'
+umount /proc
+umount /sys
+
+poweroff -d 0  -f
