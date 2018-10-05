@@ -1,0 +1,11 @@
+struct ORANGE
+{
+	int price;
+	int color;
+}
+
+struct HOUSE
+{
+	struct ORANGE *o;
+	char* name;
+}
