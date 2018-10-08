@@ -1,0 +1,51 @@
+
+
+
+Gadgets
+=======
+
+
+0x0001058c: add r4, r4, #1; ldr r3, [r5], #4; mov r2, sb; mov r1, r8; mov r0, r7; blx r3; 
+0x00010350: andeq r0, r0, r6, lsl r5; andeq r1, r2, r4, lsr #32; andeq r0, r0, r6, lsl r7; push {r3, lr}; bl #0x40c; pop {r3, pc}; 
+0x00010358: andeq r0, r0, r6, lsl r7; push {r3, lr}; bl #0x40c; pop {r3, pc}; 
+0x000105b0: andeq r0, r1, r0, lsr #19; muleq r1, r8, sb; bx lr; 
+0x000105b0: andeq r0, r1, r0, lsr #19; muleq r1, r8, sb; bx lr; push {r3, lr}; pop {r3, pc}; 
+0x00010354: andeq r1, r2, r4, lsr #32; andeq r0, r0, r6, lsl r7; push {r3, lr}; bl #0x40c; pop {r3, pc}; 
+0x00010474: asrs r1, r1, #1; bxeq lr; ldr r3, [pc, #0x10]; cmp r3, #0; bxeq lr; bx r3; 
+0x000104d0: b #0x460; ldr r3, [pc, #0x18]; cmp r3, #0; beq #0x4d0; push {r4, lr}; blx r3; 
+0x000104dc: beq #0x4d0; push {r4, lr}; blx r3; 
+0x00010360: bl #0x40c; pop {r3, pc}; 
+0x000104ac: bl #0x430; mov r3, #1; strb r3, [r4]; pop {r4, pc}; 
+0x000104e4: blx r3; 
+0x000105a8: bne #0x58c; pop {r4, r5, r6, r7, r8, sb, sl, pc}; andeq r0, r1, r0, lsr #19; muleq r1, r8, sb; bx lr; 
+0x000105b8: bx lr; 
+0x000105b8: bx lr; push {r3, lr}; pop {r3, pc}; 
+0x00010450: bx r3; 
+0x0001044c: bxeq lr; bx r3; 
+0x00010478: bxeq lr; ldr r3, [pc, #0x10]; cmp r3, #0; bxeq lr; bx r3; 
+0x00010440: bxls lr; ldr r3, [pc, #0x10]; cmp r3, #0; bxeq lr; bx r3; 
+0x000104d8: cmp r3, #0; beq #0x4d0; push {r4, lr}; blx r3; 
+0x00010448: cmp r3, #0; bxeq lr; bx r3; 
+0x000104a4: cmp r3, #0; popne {r4, pc}; bl #0x430; mov r3, #1; strb r3, [r4]; pop {r4, pc}; 
+0x0001043c: cmp r3, #6; bxls lr; ldr r3, [pc, #0x10]; cmp r3, #0; bxeq lr; bx r3; 
+0x000105a4: cmp r6, r4; bne #0x58c; pop {r4, r5, r6, r7, r8, sb, sl, pc}; andeq r0, r1, r0, lsr #19; muleq r1, r8, sb; bx lr; 
+0x00010444: ldr r3, [pc, #0x10]; cmp r3, #0; bxeq lr; bx r3; 
+0x000104d4: ldr r3, [pc, #0x18]; cmp r3, #0; beq #0x4d0; push {r4, lr}; blx r3; 
+0x00010590: ldr r3, [r5], #4; mov r2, sb; mov r1, r8; mov r0, r7; blx r3; 
+0x0001059c: mov r0, r7; blx r3; 
+0x00010598: mov r1, r8; mov r0, r7; blx r3; 
+0x00010594: mov r2, sb; mov r1, r8; mov r0, r7; blx r3; 
+0x000104b0: mov r3, #1; strb r3, [r4]; pop {r4, pc}; 
+0x000105b4: muleq r1, r8, sb; bx lr; 
+0x000105b4: muleq r1, r8, sb; bx lr; push {r3, lr}; pop {r3, pc}; 
+0x00010364: pop {r3, pc}; 
+0x000104b8: pop {r4, pc}; 
+0x000105ac: pop {r4, r5, r6, r7, r8, sb, sl, pc}; andeq r0, r1, r0, lsr #19; muleq r1, r8, sb; bx lr; 
+0x000105ac: pop {r4, r5, r6, r7, r8, sb, sl, pc}; andeq r0, r1, r0, lsr #19; muleq r1, r8, sb; bx lr; push {r3, lr}; pop {r3, pc}; 
+0x000104a8: popne {r4, pc}; bl #0x430; mov r3, #1; strb r3, [r4]; pop {r4, pc}; 
+0x0001035c: push {r3, lr}; bl #0x40c; pop {r3, pc}; 
+0x000105bc: push {r3, lr}; pop {r3, pc}; 
+0x000104e0: push {r4, lr}; blx r3; 
+0x000104b4: strb r3, [r4]; pop {r4, pc}; 
+
+42 gadgets found
