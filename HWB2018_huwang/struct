@@ -1,0 +1,5 @@
+struct CHUNK
+{
+	char *cont;
+	_DWORD size;
+}
