@@ -59,3 +59,4 @@ if __name__ == "__main__":
     io.sendline(payload)
 
     io.interactive()
+    # $ while true; do python exp.py r; done
