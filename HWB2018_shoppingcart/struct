@@ -1,0 +1,10 @@
+struct NODE
+{
+	char type[8];
+	int money_cnt;
+}
+struct GOOD
+{
+	char *good;
+	int money;
+}
