@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-def replace_free(pt):
+def replace_printf(pt):
     '''
     .text:080485B8                 push    eax             ; format
     .text:080485B9                 call    _printf
@@ -12,8 +12,8 @@ def replace_free(pt):
     void fix_printf(char *fmt)
     {
         for(int i = 0; fmt[i]; i++)
-            if(fmt[i] == 'n')
-                fmt[i] = '%';
+            if(fmt[i] == '%')
+                fmt[i] = '$';
     }
     ''')
 
