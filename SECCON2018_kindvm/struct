@@ -1,0 +1,9 @@
+struct KC
+{
+	_DWORD nop1;
+	_DWORD nop2;
+	_DWORD* username;
+	_DWORD* slogan;
+	_DWORD* p_greet;
+	_DWORD* p_farewell;
+}
