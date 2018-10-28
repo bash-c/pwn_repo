@@ -1,0 +1,6 @@
+struct PRO
+{
+	char msg[32];
+	char name[32];
+	_DOWRD age;
+}
