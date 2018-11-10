@@ -1,0 +1,6 @@
+struct NODE
+{
+	char *memo_name;
+	_DOWRD count;
+	_WORD inuse;
+}
