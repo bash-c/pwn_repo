@@ -1,3 +1,4 @@
+//  musl-gcc -static -s -Os ./solve.c -o solve
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
