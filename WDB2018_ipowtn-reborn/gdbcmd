@@ -1,0 +1,8 @@
+define hook-stop
+x/10i $pc-20
+x/20wx $sp
+i r a0 a1 a2 t9 ra
+end
+b *0x400F9C
+b *0x400F20
+c
