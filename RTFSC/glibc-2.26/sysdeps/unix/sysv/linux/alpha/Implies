@@ -1,5 +1,0 @@
-alpha/nptl
-unix/sysv/linux/wordsize-64
-# These supply the ABI compatibility for when long double was double.
-ieee754/ldbl-64-128
-ieee754/ldbl-opt

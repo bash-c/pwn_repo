@@ -1,5 +1,0 @@
-libc {
-  GLIBC_2.18 {
-    __mips_fpu_getcw; __mips_fpu_setcw;
-  }
-}

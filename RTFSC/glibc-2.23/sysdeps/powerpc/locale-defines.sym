@@ -1,5 +1,0 @@
-#include <locale/localeinfo.h>
-
---
-
-LOCALE_CTYPE_TOLOWER	offsetof (struct __locale_struct, __ctype_tolower)

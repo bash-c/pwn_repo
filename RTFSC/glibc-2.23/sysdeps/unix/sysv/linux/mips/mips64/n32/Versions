@@ -1,6 +1,0 @@
-libc {
-  GLIBC_2.19 {
-    getrlimit64;
-    setrlimit64;
-  }
-}

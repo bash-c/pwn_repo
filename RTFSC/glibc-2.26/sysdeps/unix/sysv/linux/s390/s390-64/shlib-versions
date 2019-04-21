@@ -1,2 +1,0 @@
-DEFAULT			GLIBC_2.2
-ld=ld64.so.1

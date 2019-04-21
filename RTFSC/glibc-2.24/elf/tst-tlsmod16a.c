@@ -1,1 +1,0 @@
-int __thread tlsvar;

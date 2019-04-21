@@ -1,1 +1,0 @@
-/* mempcpy is in memcpy.S */
