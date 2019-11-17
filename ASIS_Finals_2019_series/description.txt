@@ -1,0 +1,8 @@
++-----------------------------------------------------+
+| 1. Set coefficients A and B for recurrence formula: |
+|     x(n) = A * x(n-1) + B * x(n-2)                  |
+| 2. Set the number of terms to calculate             |
+| 3. Set initial values:                              |
+|     x(0) = x0, x(1) = x1                            |
+| 4. Check evaluated terms                            |
++-----------------------------------------------------+
