@@ -1,0 +1,8 @@
+#!/usr/bin/env python3
+
+print( "Write File")
+filename = input("File Name :")
+with open(filename,"wb") as file:
+        seek = int(input("Seek :"))
+        file.seek(seek)
+        file.write(bytes.fromhex(input("Data (hex):")[:20]))

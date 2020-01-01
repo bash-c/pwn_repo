@@ -1,0 +1,15 @@
+service abw
+{
+        disable = no
+        type = UNLISTED
+        wait = no
+        server = /home/abw/run.sh
+        socket_type = stream
+        protocol = tcp
+        user = abw
+        port = 12345
+        flags = REUSE
+        per_source = 5
+        rlimit_cpu = 3
+        nice = 18
+}
