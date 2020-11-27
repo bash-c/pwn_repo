@@ -1,0 +1,3 @@
+flag路径：/home/pwn/flag 
+pwn文件路径：/home/pwn/pwn
+libc-2.31.so：10fdeb77eea525914332769e9cd912ae
