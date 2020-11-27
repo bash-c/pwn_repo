@@ -1,12 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-__Auther__ = 'M4x'
 
 from pwn import *
 from time import sleep
 import sys
 context.log_level = "debug"
-context.terminal = ["deepin-terminal", "-x", "sh", "-c"]
 
 if sys.argv[1] == "l":
     #  io = process("", env = {"LD_PRELOAD": ""})
